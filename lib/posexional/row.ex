@@ -60,7 +60,7 @@ defmodule Posexional.Row do
     ...>   |> Posexional.Row.output([not_configured: "test2", another: "test3"])
     {:ok, "     "}
   """
-  @spec output(%Row{}, Keyword.t) :: binary
+  @spec output(%Row{}, Keyword.t) :: {atom, binary}
   def output(%Row{fields: []}, _), do: {:ok, ""}
   def output(row = %Row{separator: separator}, values) do
     result = do_output(row, values)

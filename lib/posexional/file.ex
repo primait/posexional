@@ -31,7 +31,8 @@ defmodule Posexional.File do
     ...> )
     ** (RuntimeError) row ne not found
   """
-  def output(file = %File{rows: rows, separator: separator}, values) do
+  @spec output(%File{}, Keyword.t) :: binary
+  def output(file = %File{separator: separator}, v = values) do
     values
     |> Stream.map(fn {row_name, values} -> {find_row(file, row_name), row_name, values} end)
     |> Enum.map(fn {row, row_name, values} ->

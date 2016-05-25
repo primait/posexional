@@ -11,6 +11,7 @@ defmodule Posexional.Field do
     filler: ?\s,
     alignment: :left
 
+  @spec new(binary, integer, char, atom) :: %Posexional.Field{}
   def new(name, size, filler \\ ?\s, alignment \\ :left) do
     %Posexional.Field{name: name, size: size, filler: filler, alignment: alignment}
   end
@@ -38,7 +39,8 @@ defmodule Posexional.Field do
     iex> Posexional.Field.output(Posexional.Field.new(:test, 10, ?0, :right), "test")
     "000000test"
   """
-  def output(field = %Field{filler: filler, size: size}, nil) do
+  @spec output(%Field{}, integer) :: binary
+  def output(%Field{filler: filler, size: size}, nil) do
     String.duplicate(to_string([filler]), size)
   end
   def output(field = %Field{size: size}, value) when is_binary(value) and byte_size(value) <= size do
