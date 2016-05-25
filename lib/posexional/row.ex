@@ -50,15 +50,15 @@ defmodule Posexional.Row do
 
     iex> Posexional.Row.new(:row_test, [Posexional.Field.new(:test1, 5), Posexional.Field.new(:test2, 10)])
     ...>   |> Posexional.Row.output([test1: "test1", non_existent: "test2"])
-    {:error, "error on the field non_existent"}
+    {:ok, "test1          "}
 
-    iex> Posexional.Row.new(:row_test, [Posexional.Field.new(:test1, 5)])
+    iex> Posexional.Row.new(:row_test, [Posexional.Field.new(:test1, 6)])
     ...>   |> Posexional.Row.output([test1: "test1", not_configured: "test2"])
-    {:error, "error on the field not_configured"}
+    {:ok, "test1 "}
 
     iex> Posexional.Row.new(:row_test, [Posexional.Field.new(:test1, 5)])
-    ...>   |> Posexional.Row.output([test1: "test1", not_configured: "test2", another: "test3"])
-    {:error, "errors on fields not_configured, another"}
+    ...>   |> Posexional.Row.output([not_configured: "test2", another: "test3"])
+    {:ok, "     "}
   """
   @spec output(%Row{}, Keyword.t) :: binary
   def output(%Row{fields: []}, _), do: {:ok, ""}
@@ -73,15 +73,12 @@ defmodule Posexional.Row do
     end
   end
 
-  defp do_output(row, values) do
-    values
-    |> Stream.map(fn ({name, value}) ->
-      {name, find_field(row, name), value}
+  defp do_output(%Row{fields: fields}, values) do
+    fields
+    |> Stream.map(fn (field = %Field{name: field_name}) ->
+      {field, Keyword.get(values, field_name, nil)}
     end)
-    |> Enum.map(fn
-      {name, nil, _}   -> {:error, name}
-      {_, field, value} -> {:ok, Field.output(field, value)}
-    end)
+    |> Enum.map(fn {field, value} -> {:ok, Field.output(field, value)} end)
   end
 
   defp error?({:ok, _}), do: false

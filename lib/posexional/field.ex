@@ -8,7 +8,7 @@ defmodule Posexional.Field do
   defstruct \
     name: nil,
     size: nil,
-    filler: ' ',
+    filler: ?\s,
     alignment: :left
 
   def new(name, size, filler \\ ?\s, alignment \\ :left) do
@@ -38,6 +38,9 @@ defmodule Posexional.Field do
     iex> Posexional.Field.output(Posexional.Field.new(:test, 10, ?0, :right), "test")
     "000000test"
   """
+  def output(field = %Field{filler: filler, size: size}, nil) do
+    String.duplicate(to_string([filler]), size)
+  end
   def output(field = %Field{size: size}, value) when is_binary(value) and byte_size(value) <= size do
     value
     |> justify(field)
