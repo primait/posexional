@@ -1,4 +1,8 @@
 defmodule Posexional.Field do
+  @moduledoc """
+  this module represent a single field in a row of a positional file
+  """
+
   alias Posexional.Field
 
   defstruct \

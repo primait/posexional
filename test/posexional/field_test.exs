@@ -1,4 +1,4 @@
 defmodule Posexional.FieldTest do
-  use ExUnit.Case, async: true
+  use Posexional.Case, async: true
   doctest Posexional.Field
 end
