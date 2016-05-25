@@ -1,0 +1,19 @@
+machine:
+  pre:
+    - curl -sSL https://s3.amazonaws.com/circle-downloads/install-circleci-docker.sh | bash -s -- 1.10.0
+  services:
+    - docker
+
+test:
+  pre:
+    - docker-compose pull
+    - docker-compose up -d
+  override:
+    - docker-compose run -e MIX_ENV=test web --warnings-as-errors --force mix credo
+    - docker-compose run -e MIX_ENV=test web mix test
+
+deployment:
+  release:
+    tag: /.*/
+    commands:
+      - ./deploy/deploy production ${CIRCLE_TAG}
