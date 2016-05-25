@@ -1,0 +1,12 @@
+#!/usr/bin/env sh
+
+mix local.hex --force
+mix local.rebar
+mix hex.info
+mix deps.get
+
+if [ -n "$1" ]; then
+  exec $@
+else
+  mix run --no-halt
+fi
