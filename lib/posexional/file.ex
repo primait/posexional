@@ -39,8 +39,8 @@ defmodule Posexional.File do
       if is_nil(row) do
         raise "row #{row_name} not found"
       end
-      {:ok, output} = Row.output(row, values)
-      output
+      {:ok, out} = Row.output(row, values)
+      out
     end)
     |> Enum.join(separator)
   end

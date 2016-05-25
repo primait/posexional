@@ -67,7 +67,7 @@ defmodule Posexional.Row do
     if Enum.all?(result, &valid?/1) do
       {:ok, result
         |> Enum.map(&(elem(&1, 1)))
-        |> Enum.join(separator) }
+        |> Enum.join(separator)}
     else
       {:error, error_message(result)}
     end

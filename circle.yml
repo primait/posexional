@@ -7,10 +7,9 @@ machine:
 test:
   pre:
     - docker-compose pull
-    - docker-compose up -d
+    - docker-compose run -e MIX_ENV=test web mix compile --warnings-as-errors --force
   override:
-    - docker-compose run -e MIX_ENV=test web --warnings-as-errors --force mix credo
-    - docker-compose run -e MIX_ENV=test web mix test
+    - docker-compose run -e MIX_ENV=test web mix do credo, test
 
 deployment:
   release:
