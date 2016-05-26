@@ -45,7 +45,7 @@ defmodule Posexional.File do
     |> Enum.join(separator)
   end
 
-  def read(file = %File{separator: separator, rows: rows}, content) do
+  def read(%File{separator: separator, rows: rows}, content) do
     content
     |> String.split(separator)
     |> Enum.flat_map(fn content ->

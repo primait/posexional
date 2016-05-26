@@ -103,7 +103,7 @@ defmodule Posexional.Row do
       }
     end)
     |> elem(0)
-    |> Enum.filter(fn {k, v} -> not k in [:progressive_number_field, :empty_field] end)
+    |> Enum.filter(fn {k, _} -> not k in [:progressive_number_field, :empty_field] end)
     [{name, res}]
   end
 
