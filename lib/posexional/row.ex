@@ -94,7 +94,8 @@ defmodule Posexional.Row do
   """
   @spec read(%Posexional.Row{}, binary) :: Keyword.t
   def read(%Row{name: name, fields: fields}, content) do
-    res = Enum.reduce(fields, {[], content}, fn field, {list, content} ->
+    res = fields
+    |> Enum.reduce({[], content}, fn field, {list, content} ->
       field_content = String.slice(content, 0, field.size)
       {
         list ++ [{FieldName.name(field), FieldRead.read(field, field_content)}],
