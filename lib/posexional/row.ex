@@ -3,7 +3,8 @@ defmodule Posexional.Row do
   this module represent a row in a positional file
   """
 
-  alias Posexional.{Row,Field}
+  alias Posexional.{Row,FieldValue}
+  alias Posexional.Protocol.{FieldName,FieldLength,FieldOutput}
 
   defstruct \
     name: nil,
@@ -20,20 +21,20 @@ defmodule Posexional.Row do
   ## Examples
 
     iex> Posexional.Row.new(:row_test, [])
-    ...>   |> Posexional.Row.lenght
+    ...>   |> Posexional.Row.length
     0
 
-    iex> Posexional.Row.new(:row_test, [Posexional.Field.new(:test1, 10), Posexional.Field.new(:test2, 20)])
-    ...>   |> Posexional.Row.lenght
+    iex> Posexional.Row.new(:row_test, [Posexional.FieldValue.new(:test1, 10), Posexional.FieldValue.new(:test2, 20)])
+    ...>   |> Posexional.Row.length
     30
   """
-  @spec lenght(%Row{}) :: integer
-  def lenght(%Row{fields: []}), do: 0
-  def lenght(%Row{fields: fields}), do: do_lenght(0, fields)
+  @spec length(%Row{}) :: integer
+  def length(%Row{fields: []}), do: 0
+  def length(%Row{fields: fields}), do: do_lenght(0, fields)
 
   defp do_lenght(acc, []), do: acc
-  defp do_lenght(acc, [%Field{size: size} | other_fields]) do
-    do_lenght(acc + size, other_fields)
+  defp do_lenght(acc, [field | other_fields]) do
+    do_lenght(acc + FieldLength.length(field), other_fields)
   end
 
   @doc """
@@ -44,20 +45,24 @@ defmodule Posexional.Row do
     iex> Posexional.Row.new(:row_test, []) |> Posexional.Row.output([test: "test"])
     {:ok, ""}
 
-    iex> Posexional.Row.new(:row_test, [Posexional.Field.new(:test1, 5), Posexional.Field.new(:test2, 10)])
+    iex> Posexional.Row.new(:row_test, [Posexional.FieldValue.new(:test1, 5), Posexional.FieldValue.new(:test2, 10)])
     ...>   |> Posexional.Row.output([test1: "test1", test2: "test2"])
     {:ok, "test1test2     "}
 
-    iex> Posexional.Row.new(:row_test, [Posexional.Field.new(:test1, 5), Posexional.Field.new(:test2, 10)])
+    iex> Posexional.Row.new(:row_test, [Posexional.FieldValue.new(:test1, 5), Posexional.FieldValue.new(:test2, 10)])
     ...>   |> Posexional.Row.output([test1: "test1", non_existent: "test2"])
     {:ok, "test1          "}
 
-    iex> Posexional.Row.new(:row_test, [Posexional.Field.new(:test1, 6)])
+    iex> Posexional.Row.new(:row_test, [Posexional.FieldValue.new(:test1, 6)])
     ...>   |> Posexional.Row.output([test1: "test1", not_configured: "test2"])
     {:ok, "test1 "}
 
-    iex> Posexional.Row.new(:row_test, [Posexional.Field.new(:test1, 5)])
+    iex> Posexional.Row.new(:row_test, [Posexional.FieldValue.new(:test1, 5)])
     ...>   |> Posexional.Row.output([not_configured: "test2", another: "test3"])
+    {:ok, "     "}
+
+    iex> Posexional.Row.new(:row_test, [Posexional.FieldEmpty.new(5)])
+    ...>   |> Posexional.Row.output([])
     {:ok, "     "}
   """
   @spec output(%Row{}, Keyword.t) :: {atom, binary}
@@ -75,10 +80,12 @@ defmodule Posexional.Row do
 
   defp do_output(%Row{fields: fields}, values) do
     fields
-    |> Stream.map(fn (field = %Field{name: field_name}) ->
-      {field, Keyword.get(values, field_name, nil)}
+    |> Enum.map(fn (field) ->
+      {field, Keyword.get(values, FieldName.name(field), nil)}
     end)
-    |> Enum.map(fn {field, value} -> {:ok, Field.output(field, value)} end)
+    |> Enum.map(fn {field, value} ->
+      {:ok, FieldOutput.output(field, value)}
+    end)
   end
 
   defp error?({:ok, _}), do: false
@@ -111,15 +118,15 @@ defmodule Posexional.Row do
     iex> Posexional.Row.new(:row_test, []) |> Posexional.Row.find_field(:test)
     nil
 
-    iex> Posexional.Row.new(:row_test, [Posexional.Field.new(:test, 5)]) |> Posexional.Row.find_field(:test)
-    Posexional.Field.new(:test, 5)
+    iex> Posexional.Row.new(:row_test, [Posexional.FieldValue.new(:test, 5)]) |> Posexional.Row.find_field(:test)
+    Posexional.FieldValue.new(:test, 5)
 
-    iex> Posexional.Row.new(:row_test, [Posexional.Field.new(:test, 5), Posexional.Field.new(:test2, 5)])
+    iex> Posexional.Row.new(:row_test, [Posexional.FieldValue.new(:test, 5), Posexional.FieldValue.new(:test2, 5)])
     ...>   |> Posexional.Row.find_field(:test2)
-    Posexional.Field.new(:test2, 5)
+    Posexional.FieldValue.new(:test2, 5)
   """
-  @spec find_field(%Row{}, atom) :: %Field{}
+  @spec find_field(%Row{}, atom) :: %FieldValue{}
   def find_field(%Row{fields: fields}, name) do
-    Enum.find(fields, nil, fn %Field{name: field_name} -> field_name === name end)
+    Enum.find(fields, nil, fn %FieldValue{name: field_name} -> field_name === name end)
   end
 end

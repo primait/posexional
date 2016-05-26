@@ -2,16 +2,31 @@ defmodule PosexionalTest do
   use Posexional.Case, async: true
 
   test "example 1" do
-    codice_impresa = Field.new(:codice_impresa, 8, ?0, :right)
-    data_inizio_elab = Field.new(:data_inizio_elab, 8)
-    ora_inizio_elab = Field.new(:ora_inizio_elab, 6)
-    progressivo = Field.new(:ora_inizio_elab, 6)
-    tipo_record = Field.new(:tipo_record, 4)
-    codice_flusso = Field.new(:codice_flusso, 8)
-    codice_impresa_destinataria = Field.new(:codice_impresa_destinataria, 4, ?0, :right)
-    blank_testata = Field.new(:blank_testata, 3)
-    row = Row.new(:ania, [codice_impresa, data_inizio_elab, ora_inizio_elab, progressivo, tipo_record, codice_flusso, codice_impresa_destinataria, blank_testata])
-
-    IO.inspect Row.output(row, [codice_impresa: "899"])
+    row = Row.new(:ania, [
+      FieldValue.new(:codice_impresa, 8, ?0, :right),
+      FieldValue.new(:data_inizio_elab, 8),
+      FieldValue.new(:ora_inizio_elab, 6),
+      FieldProgressiveNumber.new(9, ?0),
+      FieldEmpty.new(4),
+      FieldValue.new(:codice_flusso, 8),
+      FieldValue.new(:codice_impresa_destinataria, 4, ?0, :right),
+      FieldEmpty.new(3)
+    ])
+    file = File.new([row])
+    values = [ania: [
+      codice_impresa: "899",
+      data_inizio_elab: "20160524",
+      ora_inizio_elab: "100000",
+      codice_flusso: "REINPIBD",
+      codice_impresa_destinataria: "899"
+    ], ania: [
+      codice_impresa: "899",
+      data_inizio_elab: "20160524",
+      ora_inizio_elab: "100000",
+      codice_flusso: "REINPIBD",
+      codice_impresa_destinataria: "899"
+    ]]
+    assert "0000089920160524100000000000001    REINPIBD0899   \n0000089920160524100000000000002    REINPIBD0899   "
+      === Posexional.write(file, values)
   end
 end
