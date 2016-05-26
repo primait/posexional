@@ -38,6 +38,6 @@ end
 
 defimpl Posexional.Protocol.FieldOutput, for: Posexional.FieldProgressiveNumber do
   def output(field = %Posexional.FieldProgressiveNumber{generator: generator}, _) do
-    Posexional.FieldProgressiveNumber.output(field, Agent.get_and_update(generator, fn v -> {v, v+1} end))
+    Posexional.FieldProgressiveNumber.output(field, Agent.get_and_update(generator, fn v -> {v, v + 1} end))
   end
 end

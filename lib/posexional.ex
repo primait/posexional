@@ -6,10 +6,11 @@ defmodule Posexional do
 
   @spec write(%Posexional.File{}, Keyword.t) :: binary
   def write(positional_file, values) do
-    File.output(positional_file, values)
+    File.write(positional_file, values)
   end
 
   @spec read(%Posexional.File{}, binary) :: Keyword.t
   def read(positional_file, content) do
+    File.read(positional_file, content)
   end
 end

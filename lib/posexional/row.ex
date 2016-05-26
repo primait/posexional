@@ -9,32 +9,11 @@ defmodule Posexional.Row do
   defstruct \
     name: nil,
     fields: [],
-    separator: ""
+    separator: "",
+    row_guesser: nil
 
-  def new(name, fields, separator \\ "") do
-    %Row{name: name, fields: fields, separator: separator}
-  end
-
-  @doc """
-  calculate the row total length based on the passed fields
-
-  ## Examples
-
-    iex> Posexional.Row.new(:row_test, [])
-    ...>   |> Posexional.Row.length
-    0
-
-    iex> Posexional.Row.new(:row_test, [Posexional.FieldValue.new(:test1, 10), Posexional.FieldValue.new(:test2, 20)])
-    ...>   |> Posexional.Row.length
-    30
-  """
-  @spec length(%Row{}) :: integer
-  def length(%Row{fields: []}), do: 0
-  def length(%Row{fields: fields}), do: do_lenght(0, fields)
-
-  defp do_lenght(acc, []), do: acc
-  defp do_lenght(acc, [field | other_fields]) do
-    do_lenght(acc + FieldLength.length(field), other_fields)
+  def new(name, fields, separator \\ "", row_guesser \\ fn _ -> false end) do
+    %Row{name: name, fields: fields, separator: separator, row_guesser: row_guesser}
   end
 
   @doc """
@@ -42,32 +21,32 @@ defmodule Posexional.Row do
 
   ## Examples
 
-    iex> Posexional.Row.new(:row_test, []) |> Posexional.Row.output([test: "test"])
+    iex> Posexional.Row.new(:row_test, []) |> Posexional.Row.write([test: "test"])
     {:ok, ""}
 
     iex> Posexional.Row.new(:row_test, [Posexional.FieldValue.new(:test1, 5), Posexional.FieldValue.new(:test2, 10)])
-    ...>   |> Posexional.Row.output([test1: "test1", test2: "test2"])
+    ...>   |> Posexional.Row.write([test1: "test1", test2: "test2"])
     {:ok, "test1test2     "}
 
     iex> Posexional.Row.new(:row_test, [Posexional.FieldValue.new(:test1, 5), Posexional.FieldValue.new(:test2, 10)])
-    ...>   |> Posexional.Row.output([test1: "test1", non_existent: "test2"])
+    ...>   |> Posexional.Row.write([test1: "test1", non_existent: "test2"])
     {:ok, "test1          "}
 
     iex> Posexional.Row.new(:row_test, [Posexional.FieldValue.new(:test1, 6)])
-    ...>   |> Posexional.Row.output([test1: "test1", not_configured: "test2"])
+    ...>   |> Posexional.Row.write([test1: "test1", not_configured: "test2"])
     {:ok, "test1 "}
 
     iex> Posexional.Row.new(:row_test, [Posexional.FieldValue.new(:test1, 5)])
-    ...>   |> Posexional.Row.output([not_configured: "test2", another: "test3"])
+    ...>   |> Posexional.Row.write([not_configured: "test2", another: "test3"])
     {:ok, "     "}
 
     iex> Posexional.Row.new(:row_test, [Posexional.FieldEmpty.new(5)])
-    ...>   |> Posexional.Row.output([])
+    ...>   |> Posexional.Row.write([])
     {:ok, "     "}
   """
-  @spec output(%Row{}, Keyword.t) :: {atom, binary}
-  def output(%Row{fields: []}, _), do: {:ok, ""}
-  def output(row = %Row{separator: separator}, values) do
+  @spec write(%Row{}, Keyword.t) :: {atom, binary}
+  def write(%Row{fields: []}, _), do: {:ok, ""}
+  def write(row = %Row{separator: separator}, values) do
     result = do_output(row, values)
     if Enum.all?(result, &valid?/1) do
       {:ok, result
@@ -110,6 +89,14 @@ defmodule Posexional.Row do
     "errors on fields #{field_names}"
   end
 
+  @spec read(%Posexional.Row{}, binary) :: Keyword.t
+  def read(%Row{name: name, fields: fields}, content) do
+    {res, _} = Enum.reduce(fields, {[], content}, fn field, {list, content} ->
+      {list ++ [{field.name, String.slice(content, 0, field.size)}], String.slice(content, field.size..-1)}
+    end)
+    [{name, res}]
+  end
+
   @doc """
   finds a field in the row by its name
 
@@ -128,5 +115,27 @@ defmodule Posexional.Row do
   @spec find_field(%Row{}, atom) :: %FieldValue{}
   def find_field(%Row{fields: fields}, name) do
     Enum.find(fields, nil, fn %FieldValue{name: field_name} -> field_name === name end)
+  end
+
+  @doc """
+  calculate the row total length based on the passed fields
+
+  ## Examples
+
+    iex> Posexional.Row.new(:row_test, [])
+    ...>   |> Posexional.Row.length
+    0
+
+    iex> Posexional.Row.new(:row_test, [Posexional.FieldValue.new(:test1, 10), Posexional.FieldValue.new(:test2, 20)])
+    ...>   |> Posexional.Row.length
+    30
+  """
+  @spec length(%Row{}) :: integer
+  def length(%Row{fields: []}), do: 0
+  def length(%Row{fields: fields}), do: do_lenght(0, fields)
+
+  defp do_lenght(acc, []), do: acc
+  defp do_lenght(acc, [field | other_fields]) do
+    do_lenght(acc + FieldLength.length(field), other_fields)
   end
 end
