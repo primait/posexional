@@ -4,7 +4,7 @@ defmodule Posexional.Row do
   """
 
   alias Posexional.{Row,FieldValue}
-  alias Posexional.Protocol.{FieldName,FieldLength,FieldOutput}
+  alias Posexional.Protocol.{FieldName,FieldLength,FieldWrite,FieldRead}
 
   defstruct \
     name: nil,
@@ -63,7 +63,7 @@ defmodule Posexional.Row do
       {field, Keyword.get(values, FieldName.name(field), nil)}
     end)
     |> Enum.map(fn {field, value} ->
-      {:ok, FieldOutput.output(field, value)}
+      {:ok, FieldWrite.write(field, value)}
     end)
   end
 
@@ -89,11 +89,20 @@ defmodule Posexional.Row do
     "errors on fields #{field_names}"
   end
 
+  @doc """
+  read a positional file row and convert it back to a keyword list of values
+  """
   @spec read(%Posexional.Row{}, binary) :: Keyword.t
   def read(%Row{name: name, fields: fields}, content) do
-    {res, _} = Enum.reduce(fields, {[], content}, fn field, {list, content} ->
-      {list ++ [{field.name, String.slice(content, 0, field.size)}], String.slice(content, field.size..-1)}
+    res = Enum.reduce(fields, {[], content}, fn field, {list, content} ->
+      field_content = String.slice(content, 0, field.size)
+      {
+        list ++ [{FieldName.name(field), FieldRead.read(field, field_content)}],
+        String.slice(content, field.size..-1)
+      }
     end)
+    |> elem(0)
+    |> Enum.filter(fn {k, v} -> not k in [:progressive_number_field, :empty_field] end)
     [{name, res}]
   end
 
