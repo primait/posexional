@@ -8,7 +8,9 @@ defmodule Posexional.Mixfile do
      elixirc_paths: elixirc_paths(Mix.env),
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
-     deps: deps]
+     deps: deps,
+     description: description,
+     package: package]
   end
 
   defp elixirc_paths(:test), do: ["lib", "test/support"]
@@ -32,5 +34,17 @@ defmodule Posexional.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [{:credo, ">= 0.0.0"}]
+  end
+
+  defp description do
+    "A library to manage positional files"
+  end
+
+  defp package do
+    [
+      maintainers: ["Matteo Giachino"],
+      licenses: ["MIT"],
+      links: %{"GitHub" => "https://github.com/primait/posexional"}
+    ]
   end
 end
