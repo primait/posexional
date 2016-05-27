@@ -8,20 +8,20 @@ defmodule Posexional.Field do
 
   ## Examples
 
-    iex> Posexional.Field.positionalize("test", %{alignment: :left, size: 10, filler: ?\\s})
-    "test      "
+      iex> Posexional.Field.positionalize("test", %{alignment: :left, size: 10, filler: ?\\s})
+      "test      "
 
-    iex> Posexional.Field.positionalize("test", %{alignment: :right, size: 10, filler: ?\\s})
-    "      test"
+      iex> Posexional.Field.positionalize("test", %{alignment: :right, size: 10, filler: ?\\s})
+      "      test"
 
-    iex> Posexional.Field.positionalize("test", %{alignment: :right, size: 5, filler: ?\\s})
-    " test"
+      iex> Posexional.Field.positionalize("test", %{alignment: :right, size: 5, filler: ?\\s})
+      " test"
 
-    iex> Posexional.Field.positionalize("test", %{alignment: :right, size: 5, filler: ?-})
-    "-test"
+      iex> Posexional.Field.positionalize("test", %{alignment: :right, size: 5, filler: ?-})
+      "-test"
 
-    iex> Posexional.Field.positionalize("testtest", %{alignment: :right, size: 5, filler: ?-})
-    "testt"
+      iex> Posexional.Field.positionalize("testtest", %{alignment: :right, size: 5, filler: ?-})
+      "testt"
   """
   @spec positionalize(binary, map) :: binary
   def positionalize(value, %{alignment: :left, size: size, filler: filler}) do

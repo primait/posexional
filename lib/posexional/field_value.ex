@@ -20,23 +20,23 @@ defmodule Posexional.FieldValue do
 
   ## Examples
 
-    iex> Posexional.FieldValue.write(Posexional.FieldValue.new(:test, 5), "test")
-    "test "
+      iex> Posexional.FieldValue.write(Posexional.FieldValue.new(:test, 5), "test")
+      "test "
 
-    iex> Posexional.FieldValue.write(Posexional.FieldValue.new(:test, 5), "too long")
-    ** (RuntimeError) The value too long is too long for the test field. The maximum size is 5 while the value is 8
+      iex> Posexional.FieldValue.write(Posexional.FieldValue.new(:test, 5), "too long")
+      ** (RuntimeError) The value too long is too long for the test field. The maximum size is 5 while the value is 8
 
-    iex> Posexional.FieldValue.write(Posexional.FieldValue.new(:test, 10), "test")
-    "test      "
+      iex> Posexional.FieldValue.write(Posexional.FieldValue.new(:test, 10), "test")
+      "test      "
 
-    iex> Posexional.FieldValue.write(Posexional.FieldValue.new(:test, 10), "test")
-    "test      "
+      iex> Posexional.FieldValue.write(Posexional.FieldValue.new(:test, 10), "test")
+      "test      "
 
-    iex> Posexional.FieldValue.write(Posexional.FieldValue.new(:test, 10, ?0), "test")
-    "test000000"
+      iex> Posexional.FieldValue.write(Posexional.FieldValue.new(:test, 10, ?0), "test")
+      "test000000"
 
-    iex> Posexional.FieldValue.write(Posexional.FieldValue.new(:test, 10, ?0, :right), "test")
-    "000000test"
+      iex> Posexional.FieldValue.write(Posexional.FieldValue.new(:test, 10, ?0, :right), "test")
+      "000000test"
   """
   @spec write(%FieldValue{}, binary) :: binary
   def write(%FieldValue{filler: filler, size: size}, nil) do

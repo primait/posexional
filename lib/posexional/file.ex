@@ -18,17 +18,17 @@ defmodule Posexional.File do
 
   ## Examples
 
-    iex> Posexional.File.write(
-    ...>   Posexional.File.new([ Posexional.Row.new(:row_test, [ Posexional.FieldValue.new(:test1, 5) ]) ]),
-    ...>   [row_test: [test1: "test"], row_test: [test1: "t"]]
-    ...> )
-    "test \\nt    "
+      iex> Posexional.File.write(
+      ...>   Posexional.File.new([ Posexional.Row.new(:row_test, [ Posexional.FieldValue.new(:test1, 5) ]) ]),
+      ...>   [row_test: [test1: "test"], row_test: [test1: "t"]]
+      ...> )
+      "test \\nt    "
 
-    iex> Posexional.File.write(
-    ...>   Posexional.File.new([ Posexional.Row.new(:row_test, [ Posexional.FieldValue.new(:test1, 5) ]) ]),
-    ...>   [row_test: [test1: "test"], ne: [test1: "t"]]
-    ...> )
-    ** (RuntimeError) row ne not found
+      iex> Posexional.File.write(
+      ...>   Posexional.File.new([ Posexional.Row.new(:row_test, [ Posexional.FieldValue.new(:test1, 5) ]) ]),
+      ...>   [row_test: [test1: "test"], ne: [test1: "t"]]
+      ...> )
+      ** (RuntimeError) row ne not found
   """
   @spec write(%Posexional.File{}, Keyword.t) :: binary
   def write(file = %Posexional.File{separator: separator}, values) do

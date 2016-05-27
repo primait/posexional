@@ -19,11 +19,11 @@ defmodule Posexional.FieldEmpty do
 
   ## Examples
 
-    iex> Posexional.FieldEmpty.write(%Posexional.FieldEmpty{filler: ?-, size: 10})
-    "----------"
+      iex> Posexional.FieldEmpty.write(%Posexional.FieldEmpty{filler: ?-, size: 10})
+      "----------"
 
-    iex> Posexional.FieldEmpty.write(%Posexional.FieldEmpty{filler: ?\\s, size: 2})
-    "  "
+      iex> Posexional.FieldEmpty.write(%Posexional.FieldEmpty{filler: ?\\s, size: 2})
+      "  "
   """
   @spec write(%FieldEmpty{}) :: binary
   def write(%FieldEmpty{filler: filler, size: size}) do

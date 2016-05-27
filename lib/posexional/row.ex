@@ -25,28 +25,28 @@ defmodule Posexional.Row do
 
   ## Examples
 
-    iex> Posexional.Row.new(:row_test, []) |> Posexional.Row.write([test: "test"])
-    {:ok, ""}
+      iex> Posexional.Row.new(:row_test, []) |> Posexional.Row.write([test: "test"])
+      {:ok, ""}
 
-    iex> Posexional.Row.new(:row_test, [Posexional.FieldValue.new(:test1, 5), Posexional.FieldValue.new(:test2, 10)])
-    ...>   |> Posexional.Row.write([test1: "test1", test2: "test2"])
-    {:ok, "test1test2     "}
+      iex> Posexional.Row.new(:row_test, [Posexional.FieldValue.new(:test1, 5), Posexional.FieldValue.new(:test2, 10)])
+      ...>   |> Posexional.Row.write([test1: "test1", test2: "test2"])
+      {:ok, "test1test2     "}
 
-    iex> Posexional.Row.new(:row_test, [Posexional.FieldValue.new(:test1, 5), Posexional.FieldValue.new(:test2, 10)])
-    ...>   |> Posexional.Row.write([test1: "test1", non_existent: "test2"])
-    {:ok, "test1          "}
+      iex> Posexional.Row.new(:row_test, [Posexional.FieldValue.new(:test1, 5), Posexional.FieldValue.new(:test2, 10)])
+      ...>   |> Posexional.Row.write([test1: "test1", non_existent: "test2"])
+      {:ok, "test1          "}
 
-    iex> Posexional.Row.new(:row_test, [Posexional.FieldValue.new(:test1, 6)])
-    ...>   |> Posexional.Row.write([test1: "test1", not_configured: "test2"])
-    {:ok, "test1 "}
+      iex> Posexional.Row.new(:row_test, [Posexional.FieldValue.new(:test1, 6)])
+      ...>   |> Posexional.Row.write([test1: "test1", not_configured: "test2"])
+      {:ok, "test1 "}
 
-    iex> Posexional.Row.new(:row_test, [Posexional.FieldValue.new(:test1, 5)])
-    ...>   |> Posexional.Row.write([not_configured: "test2", another: "test3"])
-    {:ok, "     "}
+      iex> Posexional.Row.new(:row_test, [Posexional.FieldValue.new(:test1, 5)])
+      ...>   |> Posexional.Row.write([not_configured: "test2", another: "test3"])
+      {:ok, "     "}
 
-    iex> Posexional.Row.new(:row_test, [Posexional.FieldEmpty.new(5)])
-    ...>   |> Posexional.Row.write([])
-    {:ok, "     "}
+      iex> Posexional.Row.new(:row_test, [Posexional.FieldEmpty.new(5)])
+      ...>   |> Posexional.Row.write([])
+      {:ok, "     "}
   """
   @spec write(%Row{}, Keyword.t) :: {atom, binary}
   def write(%Row{fields: []}, _), do: {:ok, ""}
@@ -116,15 +116,15 @@ defmodule Posexional.Row do
 
   ## Examples
 
-    iex> Posexional.Row.new(:row_test, []) |> Posexional.Row.find_field(:test)
-    nil
+      iex> Posexional.Row.new(:row_test, []) |> Posexional.Row.find_field(:test)
+      nil
 
-    iex> Posexional.Row.new(:row_test, [Posexional.FieldValue.new(:test, 5)]) |> Posexional.Row.find_field(:test)
-    Posexional.FieldValue.new(:test, 5)
+      iex> Posexional.Row.new(:row_test, [Posexional.FieldValue.new(:test, 5)]) |> Posexional.Row.find_field(:test)
+      Posexional.FieldValue.new(:test, 5)
 
-    iex> Posexional.Row.new(:row_test, [Posexional.FieldValue.new(:test, 5), Posexional.FieldValue.new(:test2, 5)])
-    ...>   |> Posexional.Row.find_field(:test2)
-    Posexional.FieldValue.new(:test2, 5)
+      iex> Posexional.Row.new(:row_test, [Posexional.FieldValue.new(:test, 5), Posexional.FieldValue.new(:test2, 5)])
+      ...>   |> Posexional.Row.find_field(:test2)
+      Posexional.FieldValue.new(:test2, 5)
   """
   @spec find_field(%Row{}, atom) :: %FieldValue{}
   def find_field(%Row{fields: fields}, name) do
@@ -136,13 +136,13 @@ defmodule Posexional.Row do
 
   ## Examples
 
-    iex> Posexional.Row.new(:row_test, [])
-    ...>   |> Posexional.Row.length
-    0
+      iex> Posexional.Row.new(:row_test, [])
+      ...>   |> Posexional.Row.length
+      0
 
-    iex> Posexional.Row.new(:row_test, [Posexional.FieldValue.new(:test1, 10), Posexional.FieldValue.new(:test2, 20)])
-    ...>   |> Posexional.Row.length
-    30
+      iex> Posexional.Row.new(:row_test, [Posexional.FieldValue.new(:test1, 10), Posexional.FieldValue.new(:test2, 20)])
+      ...>   |> Posexional.Row.length
+      30
   """
   @spec length(%Row{}) :: integer
   def length(%Row{fields: []}), do: 0
