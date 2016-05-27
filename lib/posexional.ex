@@ -2,8 +2,6 @@ defmodule Posexional do
   @moduledoc """
   main module
   """
-  alias Posexional.{FieldProgressiveNumber,Row,FieldValue,FieldEmpty}
-
   @spec write(%Posexional.File{}, Keyword.t) :: binary
   def write(positional_file, values) do
     Posexional.File.write(positional_file, values)

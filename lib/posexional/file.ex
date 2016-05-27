@@ -69,7 +69,7 @@ defmodule Posexional.File do
   end
 
   @spec get_lines(%Posexional.File{}, Keyword.t) :: []
-  defp get_lines(file = %Posexional.File{separator: separator}, values) do
+  defp get_lines(file, values) do
     values
     |> Stream.map(fn {row_name, values} -> {find_row(file, row_name), row_name, values} end)
     |> Enum.map(fn {row, row_name, values} ->
