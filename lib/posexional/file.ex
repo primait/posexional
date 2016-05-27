@@ -9,7 +9,6 @@ defmodule Posexional.File do
     rows: [],
     separator: "\n"
 
-
   def new(rows, separator \\ "\n") do
     %Posexional.File{rows: rows, separator: separator}
   end
