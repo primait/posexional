@@ -33,7 +33,7 @@ defmodule Posexional.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    [{:credo, ">= 0.0.0"}]
+    [{:credo, ">= 0.0.0", only: [:dev, :test]}]
   end
 
   defp description do
