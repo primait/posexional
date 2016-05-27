@@ -3,7 +3,8 @@ defmodule Posexional.Case do
 
   using do
     quote do
-      alias Posexional.{File,Row,FieldValue,FieldEmpty,FieldProgressiveNumber}
+      alias Posexional.{File,Row}
+      alias Posexional.Field
     end
   end
 end

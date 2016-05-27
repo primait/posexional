@@ -2,8 +2,7 @@ defmodule Posexional.File do
   @moduledoc """
   a Posexional.File is the main struct to manage a positional file
   """
-
-  alias Posexional.{Row}
+  alias Posexional.Row
 
   defstruct \
     rows: [],
@@ -19,13 +18,13 @@ defmodule Posexional.File do
   ## Examples
 
       iex> Posexional.File.write(
-      ...>   Posexional.File.new([ Posexional.Row.new(:row_test, [ Posexional.FieldValue.new(:test1, 5) ]) ]),
+      ...>   Posexional.File.new([ Posexional.Row.new(:row_test, [ Posexional.Field.Value.new(:test1, 5) ]) ]),
       ...>   [row_test: [test1: "test"], row_test: [test1: "t"]]
       ...> )
       "test \\nt    "
 
       iex> Posexional.File.write(
-      ...>   Posexional.File.new([ Posexional.Row.new(:row_test, [ Posexional.FieldValue.new(:test1, 5) ]) ]),
+      ...>   Posexional.File.new([ Posexional.Row.new(:row_test, [ Posexional.Field.Value.new(:test1, 5) ]) ]),
       ...>   [row_test: [test1: "test"], ne: [test1: "t"]]
       ...> )
       ** (RuntimeError) row ne not found

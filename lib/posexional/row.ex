@@ -3,7 +3,8 @@ defmodule Posexional.Row do
   this module represent a row in a positional file
   """
 
-  alias Posexional.{Row,FieldValue}
+  alias Posexional.Row
+  alias Posexional.Field
   alias Posexional.Protocol.{FieldName,FieldLength,FieldWrite,FieldRead}
 
   defstruct \
@@ -28,23 +29,23 @@ defmodule Posexional.Row do
       iex> Posexional.Row.new(:row_test, []) |> Posexional.Row.write([test: "test"])
       {:ok, ""}
 
-      iex> Posexional.Row.new(:row_test, [Posexional.FieldValue.new(:test1, 5), Posexional.FieldValue.new(:test2, 10)])
+      iex> Posexional.Row.new(:row_test, [Posexional.Field.Value.new(:test1, 5), Posexional.Field.Value.new(:test2, 10)])
       ...>   |> Posexional.Row.write([test1: "test1", test2: "test2"])
       {:ok, "test1test2     "}
 
-      iex> Posexional.Row.new(:row_test, [Posexional.FieldValue.new(:test1, 5), Posexional.FieldValue.new(:test2, 10)])
+      iex> Posexional.Row.new(:row_test, [Posexional.Field.Value.new(:test1, 5), Posexional.Field.Value.new(:test2, 10)])
       ...>   |> Posexional.Row.write([test1: "test1", non_existent: "test2"])
       {:ok, "test1          "}
 
-      iex> Posexional.Row.new(:row_test, [Posexional.FieldValue.new(:test1, 6)])
+      iex> Posexional.Row.new(:row_test, [Posexional.Field.Value.new(:test1, 6)])
       ...>   |> Posexional.Row.write([test1: "test1", not_configured: "test2"])
       {:ok, "test1 "}
 
-      iex> Posexional.Row.new(:row_test, [Posexional.FieldValue.new(:test1, 5)])
+      iex> Posexional.Row.new(:row_test, [Posexional.Field.Value.new(:test1, 5)])
       ...>   |> Posexional.Row.write([not_configured: "test2", another: "test3"])
       {:ok, "     "}
 
-      iex> Posexional.Row.new(:row_test, [Posexional.FieldEmpty.new(5)])
+      iex> Posexional.Row.new(:row_test, [Posexional.Field.Empty.new(5)])
       ...>   |> Posexional.Row.write([])
       {:ok, "     "}
   """
@@ -96,7 +97,7 @@ defmodule Posexional.Row do
   @doc """
   read a positional file row and convert it back to a keyword list of values
   """
-  @spec read(%Posexional.Row{}, binary) :: Keyword.t
+  @spec read(%Row{}, binary) :: Keyword.t
   def read(%Row{name: name, fields: fields}, content) do
     res = fields
     |> Enum.reduce({[], content}, fn field, {list, content} ->
@@ -119,16 +120,16 @@ defmodule Posexional.Row do
       iex> Posexional.Row.new(:row_test, []) |> Posexional.Row.find_field(:test)
       nil
 
-      iex> Posexional.Row.new(:row_test, [Posexional.FieldValue.new(:test, 5)]) |> Posexional.Row.find_field(:test)
-      Posexional.FieldValue.new(:test, 5)
+      iex> Posexional.Row.new(:row_test, [Posexional.Field.Value.new(:test, 5)]) |> Posexional.Row.find_field(:test)
+      Posexional.Field.Value.new(:test, 5)
 
-      iex> Posexional.Row.new(:row_test, [Posexional.FieldValue.new(:test, 5), Posexional.FieldValue.new(:test2, 5)])
+      iex> Posexional.Row.new(:row_test, [Posexional.Field.Value.new(:test, 5), Posexional.Field.Value.new(:test2, 5)])
       ...>   |> Posexional.Row.find_field(:test2)
-      Posexional.FieldValue.new(:test2, 5)
+      Posexional.Field.Value.new(:test2, 5)
   """
-  @spec find_field(%Row{}, atom) :: %FieldValue{}
+  @spec find_field(%Row{}, atom) :: %Field.Value{}
   def find_field(%Row{fields: fields}, name) do
-    Enum.find(fields, nil, fn %FieldValue{name: field_name} -> field_name === name end)
+    Enum.find(fields, nil, fn %Field.Value{name: field_name} -> field_name === name end)
   end
 
   @doc """
@@ -140,7 +141,7 @@ defmodule Posexional.Row do
       ...>   |> Posexional.Row.length
       0
 
-      iex> Posexional.Row.new(:row_test, [Posexional.FieldValue.new(:test1, 10), Posexional.FieldValue.new(:test2, 20)])
+      iex> Posexional.Row.new(:row_test, [Posexional.Field.Value.new(:test1, 10), Posexional.Field.Value.new(:test2, 20)])
       ...>   |> Posexional.Row.length
       30
   """
