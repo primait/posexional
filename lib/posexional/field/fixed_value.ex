@@ -9,7 +9,7 @@ defmodule Posexional.Field.FixedValue do
     value: ""
 
   def new(value) do
-    %Field.FixedValue{value: value }
+    %Field.FixedValue{value: value}
   end
 end
 
