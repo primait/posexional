@@ -10,10 +10,14 @@ defmodule Posexional.Row do
     name: nil,
     fields: [],
     separator: "",
-    row_guesser: nil
+    row_guesser: :never
 
-  def new(name, fields, separator \\ "", row_guesser \\ fn _ -> false end) do
-    %Row{name: name, fields: fields, separator: separator, row_guesser: row_guesser}
+  def new(name, fields, opts \\ []) do
+    data = [
+      name: name,
+      fields: fields
+    ]
+    struct!(Row, Keyword.merge(data, opts))
   end
 
   @doc """
