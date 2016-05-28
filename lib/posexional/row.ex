@@ -13,12 +13,20 @@ defmodule Posexional.Row do
     separator: "",
     row_guesser: :never
 
+  @spec new(atom, [], Keyword.t) :: %Posexional.Row{}
   def new(name, fields, opts \\ []) do
-    data = [
-      name: name,
-      fields: fields
-    ]
-    struct!(Row, Keyword.merge(data, opts))
+    struct!(Row, Keyword.merge([name: name, fields: fields], opts))
+  end
+
+  @spec add_field(%Row{}, struct) :: %Posexional.Row{}
+  def add_field(row = %Row{fields: fields}, field) do
+    %{row | fields: fields ++ [field]}
+  end
+
+  @spec add_fields(%Row{}, []) :: %Posexional.Row{}
+  def add_fields(row, fields) do
+    fields
+    |> Enum.reduce(row, fn field, row -> add_field(row, field) end)
   end
 
   @doc """

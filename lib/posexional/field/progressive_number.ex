@@ -7,17 +7,13 @@ defmodule Posexional.Field.ProgressiveNumber do
   defstruct \
     size: nil,
     filler: ?\s,
-    alignment: :right,
-    generator: nil
+    alignment: :right
 
   @spec new(integer, char) :: %Posexional.Field.ProgressiveNumber{}
-  def new(size, filler \\ ?\s, alignment \\ :right) do
-    %Field.ProgressiveNumber{size: size, filler: filler, alignment: alignment, generator: progressive_generator}
-  end
+  def new(size, opts \\ []) do
+    opts = Keyword.merge([size: size, filler: ?\s, alignment: :right], opts)
 
-  def progressive_generator do
-    {:ok, generator} = Agent.start_link(fn -> 1 end)
-    generator
+    %Field.ProgressiveNumber{size: opts[:size], filler: opts[:filler], alignment: opts[:alignment]}
   end
 
   @spec write(%Field.ProgressiveNumber{}, integer) :: binary
@@ -37,8 +33,8 @@ defimpl Posexional.Protocol.FieldName, for: Posexional.Field.ProgressiveNumber d
 end
 
 defimpl Posexional.Protocol.FieldWrite, for: Posexional.Field.ProgressiveNumber do
-  def write(field = %Posexional.Field.ProgressiveNumber{generator: generator}, _) do
-    Posexional.Field.ProgressiveNumber.write(field, Agent.get_and_update(generator, fn v -> {v, v + 1} end))
+  def write(field, _) do
+    Posexional.Field.ProgressiveNumber.write field, Posexional.Counter.next
   end
 end
 

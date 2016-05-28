@@ -10,9 +10,10 @@ defmodule Posexional.Field.Value do
     filler: ?\s,
     alignment: :left
 
-  @spec new(atom, integer, char, atom) :: %Posexional.Field.Value{}
-  def new(name, size, filler \\ ?\s, alignment \\ :left) do
-    %Posexional.Field.Value{name: name, size: size, filler: filler, alignment: alignment}
+  @spec new(atom, integer, Keyword.t) :: %Posexional.Field.Value{}
+  def new(name, size, opts \\ []) do
+    opts = Keyword.merge([name: name, size: size, filler: ?\s, alignment: :left], opts)
+    %Posexional.Field.Value{name: opts[:name], size: opts[:size], filler: opts[:filler], alignment: opts[:alignment]}
   end
 
   @doc """
@@ -32,10 +33,10 @@ defmodule Posexional.Field.Value do
       iex> Posexional.Field.Value.write(Posexional.Field.Value.new(:test, 10), "test")
       "test      "
 
-      iex> Posexional.Field.Value.write(Posexional.Field.Value.new(:test, 10, ?0), "test")
+      iex> Posexional.Field.Value.write(Posexional.Field.Value.new(:test, 10, filler: ?0), "test")
       "test000000"
 
-      iex> Posexional.Field.Value.write(Posexional.Field.Value.new(:test, 10, ?0, :right), "test")
+      iex> Posexional.Field.Value.write(Posexional.Field.Value.new(:test, 10, filler: ?0, alignment: :right), "test")
       "000000test"
   """
   @spec write(%Field.Value{}, binary) :: binary

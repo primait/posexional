@@ -28,38 +28,40 @@ defmodule Posexional do
 
   With Posexional you can produce this file with
 
-      alias Posexional.Field
+      defmodule BeatlesFile do
+        use Posexional
 
-      beatles_row = Posexional.Row.new(:beatles, [
-        Field.Value.new(:code, 5, ?0, :right),
-        Field.ProgressiveNumber.new(5),
-        Field.Value.new(:type, 2),
-        Field.Value.new(:number, 2),
-        Field.Value.new(:name, 10, ?-),
-        Field.Empty.new(2),
-        Field.Value.new(:end, 1, ?!)
-      ])
+        @separator "\n"
 
-      file = Posexional.File.new([beatles_row])
+        row :beatles do
+          value :code, 5, filler: ?0, alignment: :right
+          progressive_number 5
+          fixed_value "AA"
+          fixed_value "01"
+          value :name, 10, filler: ?-
+          empty 2
+          value :end, 10, filler: ?!
+        end
+      end
 
-      Posexional.write(file, [beatles: [
-        code: "B1", type: "AA", number: "01", name: "george"
+      BeatlesFile.write([beatles: [
+        code: "B1", name: "george"
       ], beatles: [
-        code: "B2", type: "AA", number: "01", name: "john"
+        code: "B2", name: "john"
       ], beatles: [
-        code: "B2", type: "AA", number: "01", name: "ringo"
+        code: "B2", name: "ringo"
       ], beatles: [
-        code: "B2", type: "AA", number: "01", name: "paul"
+        code: "B2", name: "paul"
       ]])
 
-  In the first part we **define the structure**. We are not saying what the content or the number of rows there will be, we are just saying that there is a row called :beatles with the named field in it.
+  In the first part we **define the structure** inside a module. We are not saying what the content or the number of rows there will be, we are just saying that there is a row called :beatles with the structure declared by the fields
 
-  Then we create a Posexional.File struct and say that only the beatles row will be in there.
+  Then we can call BeatlesFile.write/1, we pass the data that should be written in the fields. **Just the relevant data**, The empty fields, the fixed values or the progressive number is managed by the library itself.
 
-  Then we can call Posexional.write/2, we pass the Posexional.File struct just defined and we feed the real data that should be written there. **Just the relevant data**, The empty fields or the progressive number is managed by the library itself.
-
-  And even better, with the Posexional.File struct that we defined, we can even **read a positional file**
+  And even better, with the same exact module, we can even **read a positional file** by calling read/1 and passing a binary string of the file content.
   """
+
+  alias Posexional.Field
 
   @doc """
   write a positional file with the given stuct and data
@@ -92,5 +94,82 @@ defmodule Posexional do
   def read_file!(file, path) do
     content = File.read! path
     read(file, content)
+  end
+
+  @doc """
+  add use Posexional on top of an elixir module to use macros to define fields
+  """
+  defmacro __using__(_opts) do
+    quote do
+      import unquote(__MODULE__)
+      Module.register_attribute __MODULE__, :rows, accumulate: true
+      Module.register_attribute __MODULE__, :fields, accumulate: true
+      @before_compile unquote(__MODULE__)
+    end
+  end
+
+  @doc false
+  defmacro __before_compile__(_env) do
+    quote do
+      def write(values) do
+        @rows
+        |> Enum.reverse
+        |> Posexional.File.new(@separator)
+        |> Posexional.File.write(values)
+      end
+    end
+  end
+
+  @doc false
+  defmacro row(name, do: body) do
+    quote do
+      this_row = Posexional.Row.new(unquote(name), [])
+      unquote(body)
+      @rows Posexional.Row.add_fields(this_row, Enum.reverse(@fields))
+      Module.delete_attribute(__MODULE__, :fields)
+    end
+  end
+
+  @doc false
+  defmacro value(name, size, opts \\ []) do
+    quote do
+      @fields Field.Value.new(unquote(name), unquote(size), unquote(opts))
+    end
+  end
+
+  @doc false
+  defmacro empty(size, opts \\ []) do
+    quote do
+      @fields Field.Empty.new(unquote(size), unquote(opts))
+    end
+  end
+
+  @doc false
+  defmacro fixed_value(v) do
+    quote do
+      @fields Field.FixedValue.new(unquote(v))
+    end
+  end
+
+  @doc false
+  defmacro progressive_number(size, opts \\ []) do
+    quote do
+      @fields Field.ProgressiveNumber.new(unquote(size), unquote(opts))
+    end
+  end
+
+  # See http://elixir-lang.org/docs/stable/elixir/Application.html
+  # for more information on OTP Applications
+  def start(_type, _args) do
+    import Supervisor.Spec, warn: false
+
+    children = [
+      worker(Posexional.Counter, [])
+    ]
+
+    # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html
+    # for other strategies and supported options
+    opts = [strategy: :one_for_one, name: Posexional.Supervisor]
+    Supervisor.start_link(children, opts)
   end
 end

@@ -4,23 +4,29 @@ defmodule Posexional.Field do
   """
 
   @doc """
-  justify a value given alignment, size and filler char, if the given value is longer it gets trimmed
+  justify a value given alignment, size and filler char, if the given value
+  is longer it gets trimmed
 
   ## Examples
 
-      iex> Posexional.Field.positionalize("test", %{alignment: :left, size: 10, filler: ?\\s})
+      iex> Posexional.Field.positionalize("test",
+      ...>   %{alignment: :left, size: 10, filler: ?\\s})
       "test      "
 
-      iex> Posexional.Field.positionalize("test", %{alignment: :right, size: 10, filler: ?\\s})
+      iex> Posexional.Field.positionalize("test",
+      ...>   %{alignment: :right, size: 10, filler: ?\\s})
       "      test"
 
-      iex> Posexional.Field.positionalize("test", %{alignment: :right, size: 5, filler: ?\\s})
+      iex> Posexional.Field.positionalize("test",
+      ...>   %{alignment: :right, size: 5, filler: ?\\s})
       " test"
 
-      iex> Posexional.Field.positionalize("test", %{alignment: :right, size: 5, filler: ?-})
+      iex> Posexional.Field.positionalize("test",
+      ...>   %{alignment: :right, size: 5, filler: ?-})
       "-test"
 
-      iex> Posexional.Field.positionalize("testtest", %{alignment: :right, size: 5, filler: ?-})
+      iex> Posexional.Field.positionalize("testtest",
+      ...>   %{alignment: :right, size: 5, filler: ?-})
       "testt"
   """
   @spec positionalize(binary, map) :: binary

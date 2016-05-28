@@ -8,7 +8,11 @@ defmodule Posexional.File do
     rows: [],
     separator: "\n"
 
-  def new(rows, separator \\ "\n") do
+  def new(rows, separator \\ nil)
+  def new(rows, nil) do
+    %Posexional.File{rows: rows, separator: "\n"}
+  end
+  def new(rows, separator) do
     %Posexional.File{rows: rows, separator: separator}
   end
 
@@ -31,6 +35,7 @@ defmodule Posexional.File do
   """
   @spec write(%Posexional.File{}, Keyword.t) :: binary
   def write(file = %Posexional.File{separator: separator}, values) do
+    Posexional.Counter.reset
     file
     |> get_lines(values)
     |> Enum.join(separator)

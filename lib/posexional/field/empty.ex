@@ -8,10 +8,10 @@ defmodule Posexional.Field.Empty do
     size: nil,
     filler: ?\s
 
-
   @spec new(integer, char) :: %Posexional.Field.Empty{}
-  def new(size, filler \\ ?\s) do
-    %Posexional.Field.Empty{size: size, filler: filler}
+  def new(size, opts \\ []) do
+    opts = Keyword.merge([size: size, filler: ?\s], opts)
+    %Posexional.Field.Empty{size: opts[:size], filler: opts[:filler]}
   end
 
   @doc """
