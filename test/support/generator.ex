@@ -1,25 +1,27 @@
 defmodule Posexional.Test.Generator do
+  alias Posexional.{Field,Row}
+
   def setup_file do
-    progressive_number = FieldProgressiveNumber.new(9, ?0)
+    progressive_number = Field.ProgressiveNumber.new(9, ?0)
     row = Row.new(:test, [
-      FieldValue.new(:codice_impresa, 8, ?0, :right),
-      FieldValue.new(:data_inizio_elab, 8),
-      FieldValue.new(:ora_inizio_elab, 6),
+      Field.Value.new(:codice_impresa, 8, ?0, :right),
+      Field.Value.new(:data_inizio_elab, 8),
+      Field.Value.new(:ora_inizio_elab, 6),
       progressive_number,
-      FieldEmpty.new(4),
-      FieldValue.new(:codice_flusso, 8),
-      FieldValue.new(:codice_impresa_destinataria, 4, ?0, :right),
-      FieldEmpty.new(3)
+      Field.Empty.new(4),
+      Field.Value.new(:codice_flusso, 8),
+      Field.Value.new(:codice_impresa_destinataria, 4, ?0, :right),
+      Field.Empty.new(3)
     ], :always)
     end_row = Row.new(:end, [
-      FieldValue.new(:codice_impresa, 8, ?0, :right),
-      FieldValue.new(:data_inizio_elab, 8),
-      FieldValue.new(:ora_inizio_elab, 6),
+      Field.Value.new(:codice_impresa, 8, ?0, :right),
+      Field.Value.new(:data_inizio_elab, 8),
+      Field.Value.new(:ora_inizio_elab, 6),
       progressive_number,
-      FieldValue.new(:tipo_record, 4),
-      FieldValue.new(:codice_flusso, 8),
-      FieldValue.new(:codice_impresa_destinataria, 4, ?0, :right),
-      FieldEmpty.new(3)
+      Field.Value.new(:tipo_record, 4),
+      Field.Value.new(:codice_flusso, 8),
+      Field.Value.new(:codice_impresa_destinataria, 4, ?0, :right),
+      Field.Empty.new(3)
     ], :always)
     Posexional.File.new([row, end_row])
   end
