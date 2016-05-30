@@ -140,28 +140,36 @@ defmodule Posexional do
     end
   end
 
-  @doc false
+  @doc """
+  add a value field
+  """
   defmacro value(name, size, opts \\ []) do
     quote do
       @fields Field.Value.new(unquote(name), unquote(size), unquote(opts))
     end
   end
 
-  @doc false
+  @doc """
+  add an empty field
+  """
   defmacro empty(size, opts \\ []) do
     quote do
       @fields Field.Empty.new(unquote(size), unquote(opts))
     end
   end
 
-  @doc false
+  @doc """
+  add a field with a fixed value
+  """
   defmacro fixed_value(v) do
     quote do
       @fields Field.FixedValue.new(unquote(v))
     end
   end
 
-  @doc false
+  @doc """
+  add a field with a progressive_number value
+  """
   defmacro progressive_number(name, size, opts \\ []) do
     quote do
       @fields Field.ProgressiveNumber.new(unquote(name), unquote(size), unquote(opts))
