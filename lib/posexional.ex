@@ -53,11 +53,63 @@ defmodule Posexional do
         beatles: [code: "B2", name: "paul"]
       ])
 
-  In the first part we **define the structure** inside a module. We are not saying what the content or the number of rows there will be, we are just saying that there is a row called :beatles with the structure declared by the fields
+  In the first part we **define the structure** inside a module. We are not saying what the content or the number of
+  rows there will be, we are just saying that there is a row called :beatles with the structure declared by the fields
 
-  Then we can call BeatlesFile.write/1, we pass the data that should be written in the fields. **Just the relevant data**, The empty fields, the fixed values or the progressive number is managed by the library itself.
+  Then we can call BeatlesFile.write/1, we pass the data that should be written in the fields. **Just the relevant
+  data**, The empty fields, the fixed values or the progressive number is managed by the library itself.
 
-  And even better, with the same exact module, we can even **read a positional file** by calling read/1 and passing a binary string of the file content.
+  The write/1 function accept a keyword list with the row name as key, and a keyword list of {field name, field value}
+  of data. If some data is bigger than the field size an error is thrown
+
+  With the same exact module, we can even **read a positional file** by calling read/1 and passing
+  a binary string of the file content.
+
+  There is only one thing to notice, when we write a file we **can be declarative** and say what row we want to write,
+  as well as the data we want in it. On the other hand, while reading a positional file, we don't know which rows we
+  are reading, so we need to tell in some way to every row how it is recognized, so that the parser is able to do its
+  job
+
+  Since we only have a row type (the beatles one) we can just say to the module to always match the beatles row, as
+  simple as
+
+      defmodule BeatlesFile do
+        use Posexional
+
+        @separator "\\n"
+
+        row :beatles, :always do # add :always here to always match this row while reading
+          value :code, 5, filler: ?0, alignment: :right
+          progressive_number :code, 5
+          fixed_value "AA"
+          fixed_value "01"
+          value :name, 10, filler: ?-
+          empty 2
+          fixed_value "!"
+        end
+      end
+
+  :always is a special type that always match, you could also pass :never (not so useful!) and, to gain total control
+  over the choice, a function with a single argument(the full row content) to match some data inside of it.
+
+  Now we are able to parse a positional file
+
+      "000B1    1AA01george----  !\n000B2    2AA01john------  !\n000B2    3AA01ringo-----  !\n000B2    4AA01paul------  !"
+      |> BeatlesFile.read
+      |> IO.puts
+
+  this is the output
+
+      [beatles: [code: "B1", code: 1, fixed_value: "AA", fixed_value: "01",
+        name: "george", fixed_value: "!"],
+       beatles: [code: "B2", code: 2, fixed_value: "AA", fixed_value: "01",
+        name: "john", fixed_value: "!"],
+       beatles: [code: "B2", code: 3, fixed_value: "AA", fixed_value: "01",
+        name: "ringo", fixed_value: "!"],
+       beatles: [code: "B2", code: 4, fixed_value: "AA", fixed_value: "01",
+        name: "paul", fixed_value: "!"]]
+
+    positional files cool again!!! Well no...they still sucks...but a little less.
   """
 
   alias Posexional.Field
