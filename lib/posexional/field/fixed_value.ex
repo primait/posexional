@@ -25,6 +25,10 @@ defimpl Posexional.Protocol.FieldWrite, for: Posexional.Field.FixedValue do
   def write(%Posexional.Field.FixedValue{value: value}, _), do: value
 end
 
+defimpl Posexional.Protocol.FieldSize, for: Posexional.Field.FixedValue do
+  def size(%Posexional.Field.FixedValue{value: value}), do: String.length(value)
+end
+
 defimpl Posexional.Protocol.FieldRead, for: Posexional.Field.FixedValue do
   def read(_, content), do: content
 end

@@ -61,15 +61,14 @@ defimpl Posexional.Protocol.FieldName, for: Posexional.Field.Value do
   def name(%Posexional.Field.Value{name: field_name}), do: field_name
 end
 
+defimpl Posexional.Protocol.FieldSize, for: Posexional.Field.Value do
+  def size(%Posexional.Field.Value{size: size}), do: size
+end
+
 defimpl Posexional.Protocol.FieldWrite, for: Posexional.Field.Value do
   def write(field, value), do: Posexional.Field.Value.write(field, value)
 end
 
 defimpl Posexional.Protocol.FieldRead, for: Posexional.Field.Value do
-  def read(%Posexional.Field.Value{filler: filler, alignment: :left}, content) do
-    String.rstrip(content, filler)
-  end
-  def read(%Posexional.Field.Value{filler: filler, alignment: :right}, content) do
-    String.lstrip(content, filler)
-  end
+  def read(field, content), do: Posexional.Field.depositionalize(content, field)
 end

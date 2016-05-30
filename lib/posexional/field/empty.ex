@@ -40,6 +40,10 @@ defimpl Posexional.Protocol.FieldName, for: Posexional.Field.Empty do
   def name(_), do: :empty_field
 end
 
+defimpl Posexional.Protocol.FieldSize, for: Posexional.Field.Empty do
+  def size(%Posexional.Field.Empty{size: size}), do: size
+end
+
 defimpl Posexional.Protocol.FieldWrite, for: Posexional.Field.Empty do
   def write(field, _) do
     Posexional.Field.Empty.write(field)

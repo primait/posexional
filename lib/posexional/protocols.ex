@@ -8,6 +8,11 @@ defprotocol Posexional.Protocol.FieldName do
   def name(field)
 end
 
+defprotocol Posexional.Protocol.FieldSize do
+  @doc "returns the field name"
+  def size(field)
+end
+
 defprotocol Posexional.Protocol.FieldWrite do
   @doc "returns the field to be inserted in the positional file"
   def write(field, binary)

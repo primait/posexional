@@ -26,33 +26,32 @@ defmodule Posexional do
 
   cool uh?
 
-  With Posexional you can produce this file with
+  With Posexional you can produce this file by defining a module that use Posexional
 
       defmodule BeatlesFile do
         use Posexional
 
-        @separator "\n"
+        @separator "\\n"
 
         row :beatles do
           value :code, 5, filler: ?0, alignment: :right
-          progressive_number 5
+          progressive_number :code, 5
           fixed_value "AA"
           fixed_value "01"
           value :name, 10, filler: ?-
           empty 2
-          value :end, 10, filler: ?!
+          fixed_value "!"
         end
       end
 
-      BeatlesFile.write([beatles: [
-        code: "B1", name: "george"
-      ], beatles: [
-        code: "B2", name: "john"
-      ], beatles: [
-        code: "B2", name: "ringo"
-      ], beatles: [
-        code: "B2", name: "paul"
-      ]])
+  and then use it in your code
+
+      BeatlesFile.write([
+        beatles: [code: "B1", name: "george"],
+        beatles: [code: "B2", name: "john"],
+        beatles: [code: "B2", name: "ringo"],
+        beatles: [code: "B2", name: "paul"]
+      ])
 
   In the first part we **define the structure** inside a module. We are not saying what the content or the number of rows there will be, we are just saying that there is a row called :beatles with the structure declared by the fields
 
@@ -116,6 +115,11 @@ defmodule Posexional do
         |> Posexional.File.write(values)
       end
 
+      def read(content) do
+        get_file
+        |> Posexional.File.read(content)
+      end
+
       def get_file do
         @rows
         |> Enum.reverse
@@ -124,10 +128,12 @@ defmodule Posexional do
     end
   end
 
-  @doc false
-  defmacro row(name, do: body) do
+  @doc """
+  define a row of a positional file
+  """
+  defmacro row(name, guesser \\ :never, do: body) do
     quote do
-      this_row = Posexional.Row.new(unquote(name), [])
+      this_row = Posexional.Row.new(unquote(name), [], [row_guesser: unquote(guesser)])
       unquote(body)
       @rows Posexional.Row.add_fields(this_row, Enum.reverse(@fields))
       Module.delete_attribute(__MODULE__, :fields)

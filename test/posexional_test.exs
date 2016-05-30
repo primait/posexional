@@ -74,7 +74,7 @@ defmodule PosexionalTest do
     ]
     row = Row.new(:test, fields, row_guesser: :always)
     file = File.new([row])
-    assert [test: [code: "1"], test: [code: "2"]] === Posexional.read(file, "0001001\n0002002")
+    assert [test: [code: "1", prog: 1], test: [code: "2", prog: 2]] === Posexional.read(file, "0001001\n0002002")
   end
 
   test "read a file and outputs a keyword list with empty field" do

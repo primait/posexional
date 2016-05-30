@@ -40,4 +40,18 @@ defmodule Posexional.Field do
     |> String.rjust(size, filler)
     |> String.slice(0, size)
   end
+
+  def depositionalize(content, %{alignment: :left, filler: filler}) do
+    content
+    |> String.rstrip(filler)
+    |> nil_if_empty
+  end
+  def depositionalize(content, %{alignment: :right, filler: filler}) do
+    content
+    |> String.lstrip(filler)
+    |> nil_if_empty
+  end
+
+  defp nil_if_empty(""), do: nil
+  defp nil_if_empty(v), do: v
 end

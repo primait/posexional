@@ -5,7 +5,7 @@ defmodule Posexional.Row do
 
   alias Posexional.Row
   alias Posexional.Field
-  alias Posexional.Protocol.{FieldName,FieldLength,FieldWrite,FieldRead}
+  alias Posexional.Protocol.{FieldName,FieldLength,FieldSize,FieldWrite,FieldRead}
 
   defstruct \
     name: nil,
@@ -120,14 +120,14 @@ defmodule Posexional.Row do
   def read(%Row{name: name, fields: fields}, content) do
     res = fields
     |> Enum.reduce({[], content}, fn field, {list, content} ->
-      field_content = String.slice(content, 0, field.size)
+      field_content = String.slice(content, 0, FieldSize.size(field))
       {
         list ++ [{FieldName.name(field), FieldRead.read(field, field_content)}],
-        String.slice(content, field.size..-1)
+        String.slice(content, FieldSize.size(field)..-1)
       }
     end)
     |> elem(0)
-    |> Enum.filter(fn {k, _} -> not k in [:progressive_number_field, :empty_field] end)
+    |> Enum.filter(fn {k, _} -> not k in [:empty_field] end)
     [{name, res}]
   end
 

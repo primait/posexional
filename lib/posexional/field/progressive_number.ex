@@ -31,7 +31,11 @@ defimpl Posexional.Protocol.FieldLength, for: Posexional.Field.ProgressiveNumber
 end
 
 defimpl Posexional.Protocol.FieldName, for: Posexional.Field.ProgressiveNumber do
-  def name(_), do: :progressive_number_field
+  def name(%Posexional.Field.ProgressiveNumber{name: name}), do: name
+end
+
+defimpl Posexional.Protocol.FieldSize, for: Posexional.Field.ProgressiveNumber do
+  def size(%Posexional.Field.ProgressiveNumber{size: size}), do: size
 end
 
 defimpl Posexional.Protocol.FieldWrite, for: Posexional.Field.ProgressiveNumber do
@@ -41,5 +45,11 @@ defimpl Posexional.Protocol.FieldWrite, for: Posexional.Field.ProgressiveNumber 
 end
 
 defimpl Posexional.Protocol.FieldRead, for: Posexional.Field.ProgressiveNumber do
-  def read(_, content), do: content
+  def read(field, content) do
+    content
+    |> Posexional.Field.depositionalize(field)
+    |> Integer.parse
+    |> Tuple.to_list
+    |> hd
+  end
 end
