@@ -112,10 +112,14 @@ defmodule Posexional do
   defmacro __before_compile__(_env) do
     quote do
       def write(values) do
+        get_file
+        |> Posexional.File.write(values)
+      end
+
+      def get_file do
         @rows
         |> Enum.reverse
         |> Posexional.File.new(@separator)
-        |> Posexional.File.write(values)
       end
     end
   end
@@ -152,9 +156,9 @@ defmodule Posexional do
   end
 
   @doc false
-  defmacro progressive_number(size, opts \\ []) do
+  defmacro progressive_number(name, size, opts \\ []) do
     quote do
-      @fields Field.ProgressiveNumber.new(unquote(size), unquote(opts))
+      @fields Field.ProgressiveNumber.new(unquote(name), unquote(size), unquote(opts))
     end
   end
 

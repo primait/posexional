@@ -2,14 +2,13 @@ defmodule PosexionalTest do
   use Posexional.Case, async: true
 
   test "full example" do
-    progressive_number = Field.ProgressiveNumber.new(9, filler: ?0)
     row = Row.new(:test, [
       Field.Value.new(:codice_impresa, 8, filler: ?0, alignment: :right),
       Field.Value.new(:data_inizio_elab, 8),
       Field.Value.new(:ora_inizio_elab, 6),
-      progressive_number,
+      Field.ProgressiveNumber.new(:prog, 9, filler: ?0),
       Field.Empty.new(4),
-      Field.Value.new(:codice_flusso, 8),
+      Field.FixedValue.new("REINPIBD"),
       Field.Value.new(:codice_impresa_destinataria, 4, filler: ?0, alignment: :right),
       Field.Empty.new(3)
     ])
@@ -17,9 +16,9 @@ defmodule PosexionalTest do
       Field.Value.new(:codice_impresa, 8, filler: ?0, alignment: :right),
       Field.Value.new(:data_inizio_elab, 8),
       Field.Value.new(:ora_inizio_elab, 6),
-      progressive_number,
+      Field.ProgressiveNumber.new(:prog, 9, filler: ?0),
       Field.Value.new(:tipo_record, 4),
-      Field.Value.new(:codice_flusso, 8),
+      Field.FixedValue.new("REINPIBD"),
       Field.Value.new(:codice_impresa_destinataria, 4, filler: ?0, alignment: :right),
       Field.Empty.new(3)
     ])
@@ -28,23 +27,22 @@ defmodule PosexionalTest do
       codice_impresa: "899",
       data_inizio_elab: "20160524",
       ora_inizio_elab: "100000",
-      codice_flusso: "REINPIBD",
       codice_impresa_destinataria: "899"
     ], test: [
       codice_impresa: "899",
       data_inizio_elab: "20160524",
       ora_inizio_elab: "100000",
-      codice_flusso: "REINPIBD",
       codice_impresa_destinataria: "899"
     ], end: [
       codice_impresa: "899",
       data_inizio_elab: "20160524",
       ora_inizio_elab: "100000",
-      codice_flusso: "REINPIBD",
       codice_impresa_destinataria: "899",
       tipo_record: "FINE"
     ]]
-    assert "0000089920160524100000000000001    REINPIBD0899   \n0000089920160524100000000000002    REINPIBD0899   \n0000089920160524100000000000003FINEREINPIBD0899   "
+    assert "0000089920160524100000000000001    REINPIBD0899   \n"
+      <> "0000089920160524100000000000002    REINPIBD0899   \n"
+      <> "0000089920160524100000000000003FINEREINPIBD0899   "
       === Posexional.write(file, values)
   end
 
@@ -72,7 +70,7 @@ defmodule PosexionalTest do
   test "read a file and outputs a keyword list with progressive number field" do
     fields = [
       Field.Value.new(:code, 4, filler: ?0, alignment: :right),
-      Field.ProgressiveNumber.new(3, filler: ?0)
+      Field.ProgressiveNumber.new(:prog, 3, filler: ?0)
     ]
     row = Row.new(:test, fields, row_guesser: :always)
     file = File.new([row])

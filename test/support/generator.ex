@@ -2,7 +2,7 @@ defmodule Posexional.Test.Generator do
   alias Posexional.{Field,Row}
 
   def setup_file do
-    progressive_number = Field.ProgressiveNumber.new(9, ?0)
+    progressive_number = Field.ProgressiveNumber.new(:prog, 9, filler: ?0)
     row = Row.new(:test, [
       Field.Value.new(:codice_impresa, 8, filler: ?0, alignment: :right),
       Field.Value.new(:data_inizio_elab, 8),

@@ -3,6 +3,7 @@ defmodule Posexional.File do
   a Posexional.File is the main struct to manage a positional file
   """
   alias Posexional.Row
+  alias Posexional.Field
 
   defstruct \
     rows: [],
@@ -35,8 +36,8 @@ defmodule Posexional.File do
   """
   @spec write(%Posexional.File{}, Keyword.t) :: binary
   def write(file = %Posexional.File{separator: separator}, values) do
-    Posexional.Counter.reset
     file
+    |> manage_counters
     |> get_lines(values)
     |> Enum.join(separator)
   end
@@ -84,7 +85,33 @@ defmodule Posexional.File do
     end)
   end
 
-  @spec guess_row(binary, [%Posexional.Row{}]) :: %Posexional.Row{}
+  @doc """
+  adds a generator for every progressive_number_field in the file.
+
+  The fields are grouped by name, so that you can specify many counters for every row
+  """
+  @spec manage_counters(%Posexional.File{}) :: %Posexional.File{}
+  def manage_counters(file = %Posexional.File{rows: rows}) do
+    counters = get_counters(file)
+    %{file | rows: Enum.map(rows, &(Row.manage_counters(&1, counters)))}
+  end
+
+  @spec get_counters(%Posexional.File{}) :: [{atom, pid}]
+  def get_counters(%Posexional.File{rows: rows}) do
+    rows
+    |> Enum.flat_map(&(&1.fields))
+    |> Enum.flat_map(fn
+      %Field.ProgressiveNumber{name: name} -> [name]
+      _ -> []
+    end)
+    |> Enum.uniq
+    |> Enum.map(fn name ->
+      {:ok, pid} = Agent.start_link(fn -> 1 end)
+      {name, pid}
+    end)
+  end
+
+  @spec guess_row(binary, [%Row{}]) :: %Row{}
   defp guess_row(content, rows) do
     Enum.find(rows, nil, fn
       %Row{row_guesser: :always} -> true

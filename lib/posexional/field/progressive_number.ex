@@ -5,15 +5,17 @@ defmodule Posexional.Field.ProgressiveNumber do
   alias Posexional.Field
 
   defstruct \
+    name: nil,
     size: nil,
     filler: ?\s,
-    alignment: :right
+    alignment: :right,
+    counter: nil
 
-  @spec new(integer, char) :: %Posexional.Field.ProgressiveNumber{}
-  def new(size, opts \\ []) do
-    opts = Keyword.merge([size: size, filler: ?\s, alignment: :right], opts)
+  @spec new(atom, integer, char) :: %Posexional.Field.ProgressiveNumber{}
+  def new(name, size, opts \\ []) do
+    opts = Keyword.merge([name: name, size: size, filler: ?\s, alignment: :right], opts)
 
-    %Field.ProgressiveNumber{size: opts[:size], filler: opts[:filler], alignment: opts[:alignment]}
+    %Field.ProgressiveNumber{name: opts[:name], size: opts[:size], filler: opts[:filler], alignment: opts[:alignment]}
   end
 
   @spec write(%Field.ProgressiveNumber{}, integer) :: binary
@@ -33,8 +35,8 @@ defimpl Posexional.Protocol.FieldName, for: Posexional.Field.ProgressiveNumber d
 end
 
 defimpl Posexional.Protocol.FieldWrite, for: Posexional.Field.ProgressiveNumber do
-  def write(field, _) do
-    Posexional.Field.ProgressiveNumber.write field, Posexional.Counter.next
+  def write(field = %Posexional.Field.ProgressiveNumber{counter: counter}, _) do
+    Posexional.Field.ProgressiveNumber.write(field, Agent.get_and_update(counter, &({&1, &1 + 1})))
   end
 end
 

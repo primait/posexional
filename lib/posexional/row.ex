@@ -13,20 +13,31 @@ defmodule Posexional.Row do
     separator: "",
     row_guesser: :never
 
-  @spec new(atom, [], Keyword.t) :: %Posexional.Row{}
+  @spec new(atom, [], Keyword.t) :: %Row{}
   def new(name, fields, opts \\ []) do
     struct!(Row, Keyword.merge([name: name, fields: fields], opts))
   end
 
-  @spec add_field(%Row{}, struct) :: %Posexional.Row{}
+  @spec add_field(%Row{}, struct) :: %Row{}
   def add_field(row = %Row{fields: fields}, field) do
     %{row | fields: fields ++ [field]}
   end
 
-  @spec add_fields(%Row{}, []) :: %Posexional.Row{}
+  @spec add_fields(%Row{}, []) :: %Row{}
   def add_fields(row, fields) do
     fields
     |> Enum.reduce(row, fn field, row -> add_field(row, field) end)
+  end
+
+  @spec manage_counters(%Row{}, [{atom, pid}]) :: %Row{}
+  def manage_counters(row = %Posexional.Row{fields: fields}, counters) do
+    new_fields = fields
+    |> Enum.map(fn
+      f = %Field.ProgressiveNumber{name: name} -> %{f | counter: Keyword.get(counters, name)}
+      f -> f
+    end)
+
+    %{row | fields: new_fields}
   end
 
   @doc """
