@@ -222,8 +222,8 @@ defmodule Posexional.Row do
   defmacro __using__(_opts) do
     quote do
       import unquote(__MODULE__)
-      Module.register_attribute __MODULE__, :name, []
       Module.register_attribute __MODULE__, :fields, accumulate: true
+      @name __MODULE__
       @before_compile unquote(__MODULE__)
     end
   end
@@ -234,6 +234,15 @@ defmodule Posexional.Row do
       def get_row do
         Posexional.Row.new(@name, Enum.reverse(@fields))
       end
+    end
+  end
+
+  @doc """
+  sets the row name, if no name is provided the module name will be used
+  """
+  defmacro name(name) do
+    quote do
+      @name unquote(name)
     end
   end
 
