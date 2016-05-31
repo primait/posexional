@@ -172,4 +172,39 @@ defmodule Posexional.Row do
   defp do_lenght(acc, [field | other_fields]) do
     do_lenght(acc + FieldLength.length(field), other_fields)
   end
+
+  @doc """
+  Given a row and a field name calculate the field offset
+
+  ## Examples
+
+      iex> Posexional.Row.new(:test, [Posexional.Field.Value.new(:test1, 10), Posexional.Field.Value.new(:test2, 20)])
+      ...>     |> Posexional.Row.offset(:test1)
+      1
+
+      iex> Posexional.Row.new(:test, [Posexional.Field.Value.new(:test1, 10), Posexional.Field.Value.new(:test2, 20)])
+      ...>    |> Posexional.Row.offset(:test2)
+      11
+
+      iex> Posexional.Row.new(:test, [Posexional.Field.Value.new(:test1, 10), Posexional.Field.Value.new(:test2, 20)])
+      ...>     |> Posexional.Row.offset(:test_not_existent)
+      ** (ArgumentError) the field test_not_existent doesn't exists
+
+      iex> Posexional.Row.new(:test, [])
+      ...>     |> Posexional.Row.offset(:test)
+      nil
+  """
+  @spec offset(%Row{}, atom) :: integer
+  def offset(%Row{fields: []}, field_name), do: nil
+  def offset(%Row{fields: fields}, field_name), do: do_offset(1, fields, field_name)
+
+  defp do_offset(acc, [], field_name), do: raise ArgumentError, "the field #{field_name} doesn't exists"
+  defp do_offset(acc, :ok, _), do: acc
+  defp do_offset(acc, [field | other_fields], field_name) do
+    if field_name === FieldName.name(field) do
+      do_offset(acc, :ok, field_name)
+    else
+      do_offset(acc + FieldLength.length(field), other_fields, field_name)
+    end
+  end
 end
