@@ -195,10 +195,10 @@ defmodule Posexional.Row do
       nil
   """
   @spec offset(%Row{}, atom) :: integer
-  def offset(%Row{fields: []}, field_name), do: nil
+  def offset(%Row{fields: []}, _), do: nil
   def offset(%Row{fields: fields}, field_name), do: do_offset(1, fields, field_name)
 
-  defp do_offset(acc, [], field_name), do: raise ArgumentError, "the field #{field_name} doesn't exists"
+  defp do_offset(_, [], field_name), do: raise ArgumentError, "the field #{field_name} doesn't exists"
   defp do_offset(acc, :ok, _), do: acc
   defp do_offset(acc, [field | other_fields], field_name) do
     if field_name === FieldName.name(field) do
