@@ -207,4 +207,69 @@ defmodule Posexional.Row do
       do_offset(acc + FieldLength.length(field), other_fields, field_name)
     end
   end
+
+  @doc """
+  merge fields from another row
+  """
+  @spec fields_from(%Row{}, %Row{}) :: %Row{}
+  def fields_from(to, %Row{fields: other_fields}) do
+    %{to | fields: to.fields ++ other_fields}
+  end
+
+  @doc """
+  add use Posexional on top of an elixir module to use macros to define fields
+  """
+  defmacro __using__(_opts) do
+    quote do
+      import unquote(__MODULE__)
+      Module.register_attribute __MODULE__, :name, []
+      Module.register_attribute __MODULE__, :fields, accumulate: true
+      @before_compile unquote(__MODULE__)
+    end
+  end
+
+  @doc false
+  defmacro __before_compile__(_env) do
+    quote do
+      def get_row do
+        Posexional.Row.new(@name, Enum.reverse(@fields))
+      end
+    end
+  end
+
+  @doc """
+  add a value field
+  """
+  defmacro value(name, size, opts \\ []) do
+    quote do
+      @fields Field.Value.new(unquote(name), unquote(size), unquote(opts))
+    end
+  end
+
+  @doc """
+  add an empty field
+  """
+  defmacro empty(size, opts \\ []) do
+    quote do
+      @fields Field.Empty.new(unquote(size), unquote(opts))
+    end
+  end
+
+  @doc """
+  add a field with a fixed value
+  """
+  defmacro fixed_value(v) do
+    quote do
+      @fields Field.FixedValue.new(unquote(v))
+    end
+  end
+
+  @doc """
+  add a field with a progressive_number value
+  """
+  defmacro progressive_number(name, size, opts \\ []) do
+    quote do
+      @fields Field.ProgressiveNumber.new(unquote(name), unquote(size), unquote(opts))
+    end
+  end
 end

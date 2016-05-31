@@ -3,7 +3,7 @@ defmodule Posexional.FileTest do
   doctest Posexional.File
 
   defmodule FileModule do
-    use Posexional
+    use Posexional.File
 
     @separator "||"
 
@@ -31,7 +31,7 @@ defmodule Posexional.FileTest do
   end
 
   defmodule FileModuleWithGuesser do
-    use Posexional
+    use Posexional.File
 
     @separator "||"
 

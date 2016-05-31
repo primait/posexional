@@ -112,8 +112,6 @@ defmodule Posexional do
     positional files cool again!!! Well no...they still sucks...but a little less.
   """
 
-  alias Posexional.Field
-
   @doc """
   write a positional file with the given stuct and data
   """
@@ -145,86 +143,5 @@ defmodule Posexional do
   def read_file!(file, path) do
     content = File.read! path
     read(file, content)
-  end
-
-  @doc """
-  add use Posexional on top of an elixir module to use macros to define fields
-  """
-  defmacro __using__(_opts) do
-    quote do
-      import unquote(__MODULE__)
-      Module.register_attribute __MODULE__, :rows, accumulate: true
-      Module.register_attribute __MODULE__, :fields, accumulate: true
-      @before_compile unquote(__MODULE__)
-    end
-  end
-
-  @doc false
-  defmacro __before_compile__(_env) do
-    quote do
-      def write(values) do
-        get_file
-        |> Posexional.File.write(values)
-      end
-
-      def read(content) do
-        get_file
-        |> Posexional.File.read(content)
-      end
-
-      def get_file do
-        @rows
-        |> Enum.reverse
-        |> Posexional.File.new(@separator)
-      end
-    end
-  end
-
-  @doc """
-  define a row of a positional file
-  """
-  defmacro row(name, guesser \\ :never, do: body) do
-    quote do
-      this_row = Posexional.Row.new(unquote(name), [], [row_guesser: unquote(guesser)])
-      unquote(body)
-      @rows Posexional.Row.add_fields(this_row, Enum.reverse(@fields))
-      Module.delete_attribute(__MODULE__, :fields)
-    end
-  end
-
-  @doc """
-  add a value field
-  """
-  defmacro value(name, size, opts \\ []) do
-    quote do
-      @fields Field.Value.new(unquote(name), unquote(size), unquote(opts))
-    end
-  end
-
-  @doc """
-  add an empty field
-  """
-  defmacro empty(size, opts \\ []) do
-    quote do
-      @fields Field.Empty.new(unquote(size), unquote(opts))
-    end
-  end
-
-  @doc """
-  add a field with a fixed value
-  """
-  defmacro fixed_value(v) do
-    quote do
-      @fields Field.FixedValue.new(unquote(v))
-    end
-  end
-
-  @doc """
-  add a field with a progressive_number value
-  """
-  defmacro progressive_number(name, size, opts \\ []) do
-    quote do
-      @fields Field.ProgressiveNumber.new(unquote(name), unquote(size), unquote(opts))
-    end
   end
 end

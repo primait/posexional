@@ -1,9 +1,9 @@
 defmodule Posexional.Test.FileModule do
-  use Posexional
+  use Posexional.File
 
   @separator "\n\r"
 
-  row :test do
+  row :test_inline do
     value :a, 8
     progressive_number 10, filler: ?0
     progressive_number 10, filler: ?0
@@ -11,8 +11,10 @@ defmodule Posexional.Test.FileModule do
     fixed_value "test"
   end
 
-  row :test2 do
+  row :test_with_guesser, :always do
     value :f, 4, filler: ?d
     value :g, 4, filler: ?e
   end
+
+  row Posexional.Test.RowModule
 end
