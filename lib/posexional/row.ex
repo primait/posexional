@@ -117,17 +117,16 @@ defmodule Posexional.Row do
   read a positional file row and convert it back to a keyword list of values
   """
   @spec read(%Row{}, binary) :: Keyword.t
-  def read(%Row{name: name, fields: fields}, content) do
+  def read(%Row{name: name, fields: fields, separator: separator}, content) do
     res = fields
     |> Enum.reduce({[], content}, fn field, {list, content} ->
       field_content = String.slice(content, 0, FieldSize.size(field))
-      {
-        list ++ [{FieldName.name(field), FieldRead.read(field, field_content)}],
-        String.slice(content, FieldSize.size(field)..-1)
-      }
+      {list ++ [{FieldName.name(field), FieldRead.read(field, field_content)}],
+       String.slice(content, (FieldSize.size(field) + String.length(separator))..-1)}
     end)
     |> elem(0)
     |> Enum.filter(fn {k, _} -> not k in [:empty_field] end)
+
     [{name, res}]
   end
 
@@ -214,71 +213,5 @@ defmodule Posexional.Row do
   @spec fields_from(%Row{}, %Row{}) :: %Row{}
   def fields_from(to, %Row{fields: other_fields}) do
     %{to | fields: to.fields ++ other_fields}
-  end
-
-  @doc """
-  add use Posexional on top of an elixir module to use macros to define fields
-  """
-  defmacro __using__(_opts) do
-    quote do
-      import unquote(__MODULE__)
-      Module.register_attribute __MODULE__, :fields, accumulate: true
-      @name __MODULE__
-      @before_compile unquote(__MODULE__)
-    end
-  end
-
-  @doc false
-  defmacro __before_compile__(_env) do
-    quote do
-      def get_row do
-        Posexional.Row.new(@name, Enum.reverse(@fields))
-      end
-    end
-  end
-
-  @doc """
-  sets the row name, if no name is provided the module name will be used
-  """
-  defmacro name(name) do
-    quote do
-      @name unquote(name)
-    end
-  end
-
-  @doc """
-  add a value field
-  """
-  defmacro value(name, size, opts \\ []) do
-    quote do
-      @fields Field.Value.new(unquote(name), unquote(size), unquote(opts))
-    end
-  end
-
-  @doc """
-  add an empty field
-  """
-  defmacro empty(size, opts \\ []) do
-    quote do
-      @fields Field.Empty.new(unquote(size), unquote(opts))
-    end
-  end
-
-  @doc """
-  add a field with a fixed value
-  """
-  defmacro fixed_value(v) do
-    quote do
-      @fields Field.FixedValue.new(unquote(v))
-    end
-  end
-
-  @doc """
-  add a field with a progressive_number value
-  """
-  defmacro progressive_number(name, size, opts \\ []) do
-    quote do
-      @fields Field.ProgressiveNumber.new(unquote(name), unquote(size), unquote(opts))
-    end
   end
 end

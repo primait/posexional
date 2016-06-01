@@ -1,5 +1,5 @@
 defmodule Posexional.Test.FileModule do
-  use Posexional.File
+  use PosexionalFile
 
   @separator "\n\r"
 

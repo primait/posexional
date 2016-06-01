@@ -1,9 +1,9 @@
 defmodule Posexional.FileTest do
   use Posexional.Case, async: true
-  doctest Posexional.File
+  doctest PosexionalFile
 
   defmodule FileModule do
-    use Posexional.File
+    use PosexionalFile
 
     @separator "||"
 
@@ -31,7 +31,7 @@ defmodule Posexional.FileTest do
   end
 
   defmodule FileModuleWithGuesser do
-    use Posexional.File
+    use PosexionalFile
 
     @separator "||"
 
