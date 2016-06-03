@@ -1,5 +1,5 @@
 defmodule BeatlesFile do
-  use Posexional
+  use PosexionalFile
 
   @separator "\n"
 
