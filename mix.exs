@@ -36,7 +36,9 @@ defmodule Posexional.Mixfile do
   defp deps do
     [{:credo, ">= 0.0.0", only: [:dev, :test]},
      {:ex_doc, ">= 0.0.0", only: :dev},
-     {:earmark, ">= 0.0.0", only: :dev}]
+     {:earmark, ">= 0.0.0", only: :dev},
+     {:excheck, "~> 0.3", only: :test},
+     {:triq, github: "krestenkrab/triq", only: :test}]
   end
 
   defp description do
