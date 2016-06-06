@@ -4,6 +4,7 @@ defmodule Posexional.File do
   """
   alias Posexional.Row
   alias Posexional.Field
+  import Enum
 
   defstruct \
     rows: [],
@@ -39,7 +40,7 @@ defmodule Posexional.File do
     file
     |> manage_counters
     |> get_lines(values)
-    |> Enum.join(separator)
+    |> join(separator)
   end
 
   @spec write_path!(%Posexional.File{}, Keyword.t, binary) :: binary
@@ -47,7 +48,7 @@ defmodule Posexional.File do
     File.open(path, [:write], fn (handle) ->
       file
       |> get_lines(values)
-      |> Enum.map(fn line ->
+      |> map(fn line ->
         IO.write handle, line
         IO.write handle, separator
       end)
@@ -58,11 +59,11 @@ defmodule Posexional.File do
   def read(%Posexional.File{separator: separator, rows: rows}, content) do
     content
     |> String.split(separator)
-    |> Enum.filter(fn
+    |> filter(fn
       "" -> false
       _  -> true
     end)
-    |> Enum.flat_map(fn content ->
+    |> flat_map(fn content ->
       row = guess_row(content, rows)
       if is_nil(row) do
         [content]
@@ -76,7 +77,7 @@ defmodule Posexional.File do
   defp get_lines(file, values) do
     values
     |> Stream.map(fn {row_name, values} -> {find_row(file, row_name), row_name, values} end)
-    |> Enum.map(fn {row, row_name, values} ->
+    |> map(fn {row, row_name, values} ->
       if is_nil(row) do
         raise "row #{row_name} not found"
       end
@@ -93,19 +94,19 @@ defmodule Posexional.File do
   @spec manage_counters(%Posexional.File{}) :: %Posexional.File{}
   def manage_counters(file = %Posexional.File{rows: rows}) do
     counters = get_counters(file)
-    %{file | rows: Enum.map(rows, &(Row.manage_counters(&1, counters)))}
+    %{file | rows: map(rows, &(Row.manage_counters(&1, counters)))}
   end
 
   @spec get_counters(%Posexional.File{}) :: [{atom, pid}]
   def get_counters(%Posexional.File{rows: rows}) do
     rows
-    |> Enum.flat_map(&(&1.fields))
-    |> Enum.flat_map(fn
+    |> flat_map(&(&1.fields))
+    |> flat_map(fn
       %Field.ProgressiveNumber{name: name} -> [name]
       _ -> []
     end)
-    |> Enum.uniq
-    |> Enum.map(fn name ->
+    |> uniq
+    |> map(fn name ->
       {:ok, pid} = Agent.start_link(fn -> 1 end)
       {name, pid}
     end)
@@ -113,7 +114,7 @@ defmodule Posexional.File do
 
   @spec guess_row(binary, [%Row{}]) :: %Row{}
   defp guess_row(content, rows) do
-    Enum.find(rows, nil, fn
+    find(rows, nil, fn
       %Row{row_guesser: :always} -> true
       %Row{row_guesser: :never} -> false
       %Row{row_guesser: row_guesser} when is_function(row_guesser) -> row_guesser.(content)
@@ -122,6 +123,6 @@ defmodule Posexional.File do
 
   @spec find_row(%Posexional.File{}, atom) :: %Row{}
   def find_row(%Posexional.File{rows: rows}, name) do
-    Enum.find(rows, nil, fn %Row{name: row_name} -> row_name === name end)
+    find(rows, nil, fn %Row{name: row_name} -> row_name === name end)
   end
 end

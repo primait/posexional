@@ -1,3 +1,3 @@
 use Mix.Config
 
-config :excheck, :number_iterations, 200
+config :excheck, :number_iterations, 100

@@ -6,6 +6,7 @@ defmodule Posexional.Row do
   alias Posexional.Row
   alias Posexional.Field
   alias Posexional.Protocol.{FieldName,FieldLength,FieldSize,FieldWrite,FieldRead}
+  import Enum
 
   defstruct \
     name: nil,
@@ -26,13 +27,13 @@ defmodule Posexional.Row do
   @spec add_fields(%Row{}, []) :: %Row{}
   def add_fields(row, fields) do
     fields
-    |> Enum.reduce(row, fn field, row -> add_field(row, field) end)
+    |> reduce(row, fn field, row -> add_field(row, field) end)
   end
 
   @spec manage_counters(%Row{}, [{atom, pid}]) :: %Row{}
   def manage_counters(row = %Posexional.Row{fields: fields}, counters) do
     new_fields = fields
-    |> Enum.map(fn
+    |> map(fn
       f = %Field.ProgressiveNumber{name: name} -> %{f | counter: Keyword.get(counters, name)}
       f -> f
     end)
@@ -72,10 +73,10 @@ defmodule Posexional.Row do
   def write(%Row{fields: []}, _), do: {:ok, ""}
   def write(row = %Row{separator: separator}, values) do
     result = do_output(row, values)
-    if Enum.all?(result, &valid?/1) do
+    if all?(result, &valid?/1) do
       {:ok, result
-        |> Enum.map(&(elem(&1, 1)))
-        |> Enum.join(separator)}
+        |> map(&(elem(&1, 1)))
+        |> join(separator)}
     else
       {:error, error_message(result)}
     end
@@ -83,10 +84,10 @@ defmodule Posexional.Row do
 
   defp do_output(%Row{fields: fields}, values) do
     fields
-    |> Enum.map(fn (field) ->
+    |> map(fn (field) ->
       {field, Keyword.get(values, FieldName.name(field), nil)}
     end)
-    |> Enum.map(fn {field, value} ->
+    |> map(fn {field, value} ->
       {:ok, FieldWrite.write(field, value)}
     end)
   end
@@ -99,7 +100,7 @@ defmodule Posexional.Row do
 
   defp error_message(results) do
     results
-    |> Enum.filter(&error?/1)
+    |> filter(&error?/1)
     |> do_error_message
   end
 
@@ -108,8 +109,8 @@ defmodule Posexional.Row do
   end
   defp do_error_message(errors) do
     field_names = errors
-    |> Enum.map(&(elem(&1, 1)))
-    |> Enum.join(", ")
+    |> map(&(elem(&1, 1)))
+    |> join(", ")
     "errors on fields #{field_names}"
   end
 
@@ -119,13 +120,13 @@ defmodule Posexional.Row do
   @spec read(%Row{}, binary) :: Keyword.t
   def read(%Row{name: name, fields: fields, separator: separator}, content) do
     res = fields
-    |> Enum.reduce({[], content}, fn field, {list, content} ->
+    |> reduce({[], content}, fn field, {list, content} ->
       field_content = String.slice(content, 0, FieldSize.size(field))
       {list ++ [{FieldName.name(field), FieldRead.read(field, field_content)}],
        String.slice(content, (FieldSize.size(field) + String.length(separator))..-1)}
     end)
     |> elem(0)
-    |> Enum.filter(fn {k, _} -> not k in [:empty_field] end)
+    |> filter(fn {k, _} -> not k in [:empty_field] end)
 
     [{name, res}]
   end
@@ -147,7 +148,7 @@ defmodule Posexional.Row do
   """
   @spec find_field(%Row{}, atom) :: %Field.Value{}
   def find_field(%Row{fields: fields}, name) do
-    Enum.find(fields, nil, fn %Field.Value{name: field_name} -> field_name === name end)
+    find(fields, nil, fn %Field.Value{name: field_name} -> field_name === name end)
   end
 
   @doc """
