@@ -26,10 +26,28 @@ defmodule Posexional.RowTest do
     def matcher(_), do: false
   end
 
+  defmodule OtherRowModule do
+    use PosexionalRow
+
+    import_fields_from Posexional.RowTest.RowModule
+
+    guesser &__MODULE__.matcher/1
+    separator "|"
+
+    def matcher(<< "test", _ :: binary >>), do: true
+    def matcher(_), do: false
+  end
+
   defmodule FileModule do
     use PosexionalFile
 
     row Posexional.RowTest.RowModule
+  end
+
+  defmodule OtherFileModule do
+    use PosexionalFile
+
+    row Posexional.RowTest.OtherRowModule
   end
 
   test "the row module has the correct name" do
@@ -45,7 +63,16 @@ defmodule Posexional.RowTest do
   end
 
   test "an unkonwn row do not match" do
-    assert [{Posexional.RowTest.RowModule, [fixed_value: "test", a: "A", progressive: 1]}, "nono|A       |00002|-----"]
+    assert [{Posexional.RowTest.RowModule, [fixed_value: "test", a: "A       ", progressive: 1]}, "nono|A       |00002|-----"]
       === Posexional.RowTest.FileModule.read("test|A       |00001|-----\nnono|A       |00002|-----")
+  end
+
+  test "import field from another row module yields a row struct with the same fields" do
+    assert Posexional.RowTest.OtherRowModule.get_row.fields === Posexional.RowTest.RowModule.get_row.fields
+  end
+
+  test "file module with imported row works" do
+    assert [{Posexional.RowTest.OtherRowModule, [fixed_value: "test", a: "A       ", progressive: 1]}, "nono|A       |00002|-----"]
+      === Posexional.RowTest.OtherFileModule.read("test|A       |00001|-----\nnono|A       |00002|-----")
   end
 end

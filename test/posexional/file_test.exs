@@ -48,7 +48,7 @@ defmodule Posexional.FileTest do
     res = "testtest-001001||test-----002002"
     |> Posexional.FileTest.FileModuleWithGuesser.read
     assert [
-      test: [fixed_value: "te", fixed_value: "st", test_value: "test", test1: 1, test2: 1],
+      test: [fixed_value: "te", fixed_value: "st", test_value: "test-", test1: 1, test2: 1],
       test: [fixed_value: "te", fixed_value: "st", test_value: nil, test1: 2, test2: 2]
     ] === res
   end

@@ -11,11 +11,10 @@ defmodule PosexionalRow do
   defmacro __using__(_opts) do
     quote do
       import unquote(__MODULE__)
-      import Posexional.Row
       Module.register_attribute __MODULE__, :fields, accumulate: true
       @name __MODULE__
       @guesser :never
-      @separator "\n"
+      @separator ""
       @before_compile unquote(__MODULE__)
     end
   end
@@ -89,6 +88,17 @@ defmodule PosexionalRow do
   defmacro progressive_number(field_name, size, opts \\ []) do
     quote do
       @fields Field.ProgressiveNumber.new(unquote(field_name), unquote(size), unquote(opts))
+    end
+  end
+
+  @doc """
+  add all fields from another row module
+  """
+  defmacro import_fields_from(module_name) do
+    quote do
+      Enum.each unquote(module_name).get_row.fields, fn field ->
+        @fields field
+      end
     end
   end
 end
