@@ -10,46 +10,6 @@ defmodule Posexional.RowTest do
     assert 3 === length(new_row.fields)
   end
 
-  defmodule RowModule do
-    use PosexionalRow
-
-    name __MODULE__
-    guesser &__MODULE__.matcher/1
-    separator "|"
-
-    fixed_value "test"
-    value :a, 8
-    progressive_number :progressive, 5, filler: ?0, alignment: :right
-    empty 5, filler: ?-
-
-    def matcher(<< "test", _ :: binary >>), do: true
-    def matcher(_), do: false
-  end
-
-  defmodule OtherRowModule do
-    use PosexionalRow
-
-    import_fields_from Posexional.RowTest.RowModule
-
-    guesser &__MODULE__.matcher/1
-    separator "|"
-
-    def matcher(<< "test", _ :: binary >>), do: true
-    def matcher(_), do: false
-  end
-
-  defmodule FileModule do
-    use PosexionalFile
-
-    row Posexional.RowTest.RowModule
-  end
-
-  defmodule OtherFileModule do
-    use PosexionalFile
-
-    row Posexional.RowTest.OtherRowModule
-  end
-
   test "the row module has the correct name" do
     assert Posexional.RowTest.RowModule === Posexional.RowTest.RowModule.get_row.name
   end
@@ -74,5 +34,76 @@ defmodule Posexional.RowTest do
   test "file module with imported row works" do
     assert [{Posexional.RowTest.OtherRowModule, [fixed_value: "test", a: "A       ", progressive: 1]}, "nono|A       |00002|-----"]
       === Posexional.RowTest.OtherFileModule.read("test|A       |00001|-----\nnono|A       |00002|-----")
+  end
+
+  test "file module with default value in the row" do
+    assert "defaultrow|A       " === Posexional.RowTest.DefaultFileModule.write([
+      with_defaults: []
+    ])
+  end
+
+  test "default is ignored if value is provided" do
+    assert "defaultrow|B       " === Posexional.RowTest.DefaultFileModule.write([
+      with_defaults: [a: "B"]
+    ])
+  end
+
+  # moduli di esempio
+
+  defmodule RowModule do
+    use PosexionalRow
+
+    name __MODULE__
+    guesser &__MODULE__.matcher/1
+    separator "|"
+
+    fixed_value "test"
+    value :a, 8
+    progressive_number :progressive, 5, filler: ?0, alignment: :right
+    empty 5, filler: ?-
+
+    def matcher(<< "test", _ :: binary >>), do: true
+    def matcher(_), do: false
+  end
+  defmodule FileModule do
+    use PosexionalFile
+
+    row Posexional.RowTest.RowModule
+  end
+
+  defmodule OtherRowModule do
+    use PosexionalRow
+
+    import_fields_from Posexional.RowTest.RowModule
+
+    guesser &__MODULE__.matcher/1
+    separator "|"
+
+    def matcher(<< "test", _ :: binary >>), do: true
+    def matcher(_), do: false
+  end
+  defmodule OtherFileModule do
+    use PosexionalFile
+
+    row Posexional.RowTest.OtherRowModule
+  end
+
+  defmodule DefaultRowModule do
+    use PosexionalRow
+
+    name :with_defaults
+    guesser &__MODULE__.matcher/1
+    separator "|"
+
+    fixed_value "defaultrow"
+    value :a, 8, default: "A"
+
+    def matcher(<< "defaultrow", _ :: binary >>), do: true
+    def matcher(_), do: false
+  end
+  defmodule DefaultFileModule do
+    use PosexionalFile
+
+    row Posexional.RowTest.DefaultRowModule
   end
 end

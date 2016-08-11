@@ -8,12 +8,19 @@ defmodule Posexional.Field.Value do
     name: nil,
     size: nil,
     filler: ?\s,
-    alignment: :left
+    alignment: :left,
+    default: nil
 
   @spec new(atom, integer, Keyword.t) :: %Posexional.Field.Value{}
   def new(name, size, opts \\ []) do
-    opts = Keyword.merge([name: name, size: size, filler: ?\s, alignment: :left], opts)
-    %Posexional.Field.Value{name: opts[:name], size: opts[:size], filler: opts[:filler], alignment: opts[:alignment]}
+    opts = Keyword.merge([name: name, size: size, filler: ?\s, alignment: :left, default: nil], opts)
+    %Posexional.Field.Value{
+      name: opts[:name],
+      size: opts[:size],
+      filler: opts[:filler],
+      alignment: opts[:alignment],
+      default: opts[:default]
+    }
   end
 
   @doc """
@@ -40,8 +47,12 @@ defmodule Posexional.Field.Value do
       "000000test"
   """
   @spec write(%Field.Value{}, binary) :: binary
-  def write(%Field.Value{filler: filler, size: size}, nil) do
+  def write(%Field.Value{filler: filler, size: size, default: nil}, nil) do
     String.duplicate(to_string([filler]), size)
+  end
+  def write(field = %Field.Value{default: default}, nil) do
+    default
+    |> Field.positionalize(field)
   end
   def write(field = %Field.Value{size: size}, value) when is_binary(value) and byte_size(value) <= size do
     value
