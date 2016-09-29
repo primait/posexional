@@ -29,7 +29,7 @@ defmodule Posexional do
   With Posexional you can produce this file by defining a module that use Posexional
 
       defmodule BeatlesFile do
-        use PosexionalFIle
+        use PosexionalFile
 
         @separator "\\n"
 

@@ -33,7 +33,7 @@ defmodule Posexional.Row do
   @spec manage_counters(%Row{}, [{atom, pid}]) :: %Row{}
   def manage_counters(row = %Posexional.Row{fields: fields}, counters) do
     new_fields = fields
-    |> map(fn
+    |> Stream.map(fn
       f = %Field.ProgressiveNumber{name: name} -> %{f | counter: Keyword.get(counters, name)}
       f -> f
     end)

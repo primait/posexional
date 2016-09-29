@@ -47,11 +47,13 @@ defmodule Posexional.File do
   def write_path!(file = %Posexional.File{separator: separator}, values, path) do
     File.open(path, [:write], fn (handle) ->
       file
+      |> manage_counters
       |> get_lines(values)
-      |> map(fn line ->
+      |> Stream.map(fn line ->
         IO.write handle, line
         IO.write handle, separator
       end)
+      |> Stream.run
     end)
   end
 
@@ -77,7 +79,7 @@ defmodule Posexional.File do
   defp get_lines(file, values) do
     values
     |> Stream.map(fn {row_name, values} -> {find_row(file, row_name), row_name, values} end)
-    |> map(fn {row, row_name, values} ->
+    |> Stream.map(fn {row, row_name, values} ->
       if is_nil(row) do
         raise "row #{row_name} not found"
       end
@@ -94,18 +96,18 @@ defmodule Posexional.File do
   @spec manage_counters(%Posexional.File{}) :: %Posexional.File{}
   def manage_counters(file = %Posexional.File{rows: rows}) do
     counters = get_counters(file)
-    %{file | rows: map(rows, &(Row.manage_counters(&1, counters)))}
+    %{file | rows: Stream.map(rows, &(Row.manage_counters(&1, counters)))}
   end
 
   @spec get_counters(%Posexional.File{}) :: [{atom, pid}]
   def get_counters(%Posexional.File{rows: rows}) do
     rows
-    |> flat_map(&(&1.fields))
-    |> flat_map(fn
+    |> Stream.flat_map(&(&1.fields))
+    |> Stream.flat_map(fn
       %Field.ProgressiveNumber{name: name} -> [name]
       _ -> []
     end)
-    |> uniq
+    |> Stream.uniq
     |> map(fn name ->
       {:ok, pid} = Agent.start_link(fn -> 1 end)
       {name, pid}
