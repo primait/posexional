@@ -1,2 +1,2 @@
 ExCheck.start
-ExUnit.start
+ExUnit.start(exclude: [:experiments])

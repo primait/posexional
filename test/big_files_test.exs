@@ -15,6 +15,7 @@ defmodule Posexional.BigFilesTest do
     end
   end
 
+  @tag :experiments
   test "many rows" do
     rows = 1..100_000
     |> Stream.map(fn num ->
