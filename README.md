@@ -4,14 +4,11 @@ Elixir library for positional files
 
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed as:
-
-  1. Add posexional to your list of dependencies in `mix.exs`:
+the package can be installed by adding posexional to your list of dependencies in `mix.exs`:
 
         def deps do
-          [{:posexional, "~> 0.0.1"}]
+          [{:posexional, "~> 0.4.0"}]
         end
-
 
 ## Docs
 
