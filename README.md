@@ -7,7 +7,7 @@ Elixir library for positional files
 the package can be installed by adding posexional to your list of dependencies in `mix.exs`:
 
         def deps do
-          [{:posexional, "~> 0.4.0"}]
+          [{:posexional, "~> 0.4"}]
         end
 
 ## Docs
