@@ -45,6 +45,9 @@ defmodule Posexional.Field.Value do
 
       iex> Posexional.Field.Value.write(Posexional.Field.Value.new(:test, 10, filler: ?0, alignment: :right), "test")
       "000000test"
+
+      iex> Posexional.Field.Value.write(Posexional.Field.Value.new(:test, 10), 50)
+      ** (RuntimeError) The value provided for the test field doesn't seem to be a string
   """
   @spec write(%Field.Value{}, binary) :: binary
   def write(%Field.Value{filler: filler, size: size, default: nil}, nil) do
@@ -57,6 +60,9 @@ defmodule Posexional.Field.Value do
   def write(field = %Field.Value{size: size}, value) when is_binary(value) and byte_size(value) <= size do
     value
     |> Field.positionalize(field)
+  end
+  def write(%Field.Value{name: name}, value) when not is_binary(value) do
+    raise "The value provided for the #{name} field doesn't seem to be a string"
   end
   def write(%Field.Value{name: name, size: size}, value) do
     raise "The value #{ value } is too long for the #{ name } field. "
