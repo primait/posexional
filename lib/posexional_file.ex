@@ -21,17 +21,17 @@ defmodule PosexionalFile do
   defmacro __before_compile__(_env) do
     quote do
       def write(values) do
-        get_file
+        get_file()
         |> Posexional.File.write(values)
       end
 
       def write_file!(values, file) do
-        get_file
+        get_file()
         |> Posexional.File.write_path!(values, file)
       end
 
       def read(content) do
-        get_file
+        get_file()
         |> Posexional.File.read(content)
       end
 

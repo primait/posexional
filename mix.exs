@@ -3,14 +3,14 @@ defmodule Posexional.Mixfile do
 
   def project do
     [app: :posexional,
-     version: "0.4.1",
+     version: "0.4.2",
      elixir: "~> 1.2",
      elixirc_paths: elixirc_paths(Mix.env),
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
-     deps: deps,
-     description: description,
-     package: package,
+     deps: deps(),
+     description: description(),
+     package: package(),
      docs: [main: "Posexional"]]
   end
 
@@ -35,9 +35,7 @@ defmodule Posexional.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [{:credo, ">= 0.0.0", only: [:dev, :test]},
-     {:ex_doc, ">= 0.0.0", only: :dev},
-     {:excheck, "~> 0.3", only: :test},
-     {:triq, github: "krestenkrab/triq", only: :test}]
+     {:ex_doc, ">= 0.0.0", only: :dev}]
   end
 
   defp description do

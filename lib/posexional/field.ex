@@ -32,18 +32,22 @@ defmodule Posexional.Field do
   @spec positionalize(binary, map) :: binary
   def positionalize(value, %{alignment: :left, size: size, filler: filler}) do
     value
-    |> String.ljust(size, filler)
+    |> String.pad_trailing(size, filler_to_list_of_string(filler))
     |> String.slice(0, size)
   end
   def positionalize(value, %{alignment: :right, size: size, filler: filler}) do
     value
-    |> String.rjust(size, filler)
+    |> String.pad_leading(size, filler_to_list_of_string(filler))
     |> String.slice(0, size)
   end
 
   def depositionalize(content, %{filler: filler}) do
     content
     |> nil_if_empty(filler)
+  end
+
+  defp filler_to_list_of_string(filler) do
+    [to_string([filler])]
   end
 
   @doc """
@@ -63,7 +67,7 @@ defmodule Posexional.Field do
   """
   def contains_only?(v, filler) do
     v
-    |> String.to_char_list
+    |> String.to_charlist
     |> Enum.all?(&(&1 === filler))
   end
 end
