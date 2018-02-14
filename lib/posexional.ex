@@ -63,7 +63,7 @@ defmodule Posexional do
   of data. If some data is bigger than the field size an error is thrown
 
   With the same exact module, we can even **read a positional file** by calling read/1 and passing
-  a String.t() string of the file content.
+  a binary string of the file content.
 
   There is only one thing to notice, when we write a file we **can be declarative** and say what row we want to write,
   as well as the data we want in it. On the other hand, while reading a positional file, we don't know which rows we

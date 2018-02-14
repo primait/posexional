@@ -55,7 +55,7 @@ defmodule Posexional.Mixfile do
 
   defp package do
     [
-      maintainers: ["Matteo Giachino", "Simone Quaini"],
+      maintainers: ["Matteo Giachino"],
       licenses: ["MIT"],
       links: %{
         "GitHub" => "https://github.com/primait/posexional"

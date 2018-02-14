@@ -57,6 +57,6 @@ defimpl Posexional.Protocol.FieldRead, for: Posexional.Field.ProgressiveNumber d
     |> Posexional.Field.depositionalize(field)
     |> Integer.parse()
     |> Tuple.to_list()
-    |> hd
+    |> hd()
   end
 end
