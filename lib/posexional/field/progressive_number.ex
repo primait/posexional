@@ -2,26 +2,33 @@ defmodule Posexional.Field.ProgressiveNumber do
   @moduledoc """
   this module represent a single field in a row of a positional file with a progressive number
   """
+
   alias Posexional.Field
 
-  defstruct \
-    name: nil,
-    size: nil,
-    filler: ?\s,
-    alignment: :right,
-    counter: nil
+  @type t :: %__MODULE__{}
 
-  @spec new(atom, integer, char) :: %Posexional.Field.ProgressiveNumber{}
+  defstruct name: nil,
+            size: nil,
+            filler: ?\s,
+            alignment: :right,
+            counter: nil
+
+  @spec new(atom(), integer(), Keyword.t()) :: t()
   def new(name, size, opts \\ []) do
     opts = Keyword.merge([name: name, size: size, filler: ?\s, alignment: :right], opts)
 
-    %Field.ProgressiveNumber{name: opts[:name], size: opts[:size], filler: opts[:filler], alignment: opts[:alignment]}
+    %__MODULE__{
+      name: opts[:name],
+      size: opts[:size],
+      filler: opts[:filler],
+      alignment: opts[:alignment]
+    }
   end
 
-  @spec write(%Field.ProgressiveNumber{}, integer) :: binary
+  @spec write(t(), integer()) :: String.t()
   def write(field, value) do
     value
-    |> to_string
+    |> to_string()
     |> Field.positionalize(field)
   end
 end
@@ -40,7 +47,7 @@ end
 
 defimpl Posexional.Protocol.FieldWrite, for: Posexional.Field.ProgressiveNumber do
   def write(field = %Posexional.Field.ProgressiveNumber{counter: counter}, _) do
-    Posexional.Field.ProgressiveNumber.write(field, Agent.get_and_update(counter, &({&1, &1 + 1})))
+    Posexional.Field.ProgressiveNumber.write(field, Agent.get_and_update(counter, &{&1, &1 + 1}))
   end
 end
 
@@ -48,8 +55,8 @@ defimpl Posexional.Protocol.FieldRead, for: Posexional.Field.ProgressiveNumber d
   def read(field, content) do
     content
     |> Posexional.Field.depositionalize(field)
-    |> Integer.parse
-    |> Tuple.to_list
+    |> Integer.parse()
+    |> Tuple.to_list()
     |> hd
   end
 end

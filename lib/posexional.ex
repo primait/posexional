@@ -63,7 +63,7 @@ defmodule Posexional do
   of data. If some data is bigger than the field size an error is thrown
 
   With the same exact module, we can even **read a positional file** by calling read/1 and passing
-  a binary string of the file content.
+  a String.t() string of the file content.
 
   There is only one thing to notice, when we write a file we **can be declarative** and say what row we want to write,
   as well as the data we want in it. On the other hand, while reading a positional file, we don't know which rows we
@@ -115,7 +115,7 @@ defmodule Posexional do
   @doc """
   write a positional file with the given stuct and data
   """
-  @spec write(%Posexional.File{}, Keyword.t) :: binary
+  @spec write(Posexional.File.t(), Keyword.t()) :: String.t()
   def write(positional_file, values) do
     Posexional.File.write(positional_file, values)
   end
@@ -123,7 +123,7 @@ defmodule Posexional do
   @doc """
   same as write/2, but with a path to a new file to write the result to
   """
-  @spec write_file!(%Posexional.File{}, Keyword.t, binary) :: nil
+  @spec write_file!(Posexional.File.t(), Keyword.t(), String.t()) :: String.t()
   def write_file!(positional_file, values, path) do
     Posexional.File.write_path!(positional_file, values, path)
   end
@@ -131,7 +131,7 @@ defmodule Posexional do
   @doc """
   read a positional stream of data with the given struct, returns a keyword list of the extracted data
   """
-  @spec read(%Posexional.File{}, binary) :: Keyword.t
+  @spec read(Posexional.File.t(), String.t()) :: Keyword.t()
   def read(positional_file, content) do
     Posexional.File.read(positional_file, content)
   end
@@ -139,9 +139,9 @@ defmodule Posexional do
   @doc """
   same as read/2, but with a path to a file to read the stream from
   """
-  @spec read_file!(%Posexional.File{}, binary) :: Keyword.t
+  @spec read_file!(Posexional.File.t(), String.t()) :: Keyword.t()
   def read_file!(file, path) do
-    content = File.read! path
+    content = File.read!(path)
     read(file, content)
   end
 end

@@ -3,13 +3,14 @@ defmodule Posexional.Field.FixedValue do
   this module represent a fixed value field
   it is initialized with its value and it never change
   """
-  alias Posexional.Field
 
-  defstruct \
-    value: ""
+  @type t :: %__MODULE__{}
 
+  defstruct value: ""
+
+  @spec new(any()) :: t()
   def new(value) do
-    %Field.FixedValue{value: value}
+    %__MODULE__{value: value}
   end
 end
 

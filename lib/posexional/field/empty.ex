@@ -2,16 +2,16 @@ defmodule Posexional.Field.Empty do
   @moduledoc """
   this module represent a single field in a row of a positional file without a value
   """
-  alias Posexional.Field
 
-  defstruct \
-    size: nil,
-    filler: ?\s
+  @type t :: %__MODULE__{}
 
-  @spec new(integer, char) :: %Posexional.Field.Empty{}
+  defstruct size: nil,
+            filler: ?\s
+
+  @spec new(integer(), Keyword.t()) :: t()
   def new(size, opts \\ []) do
     opts = Keyword.merge([size: size, filler: ?\s], opts)
-    %Posexional.Field.Empty{size: opts[:size], filler: opts[:filler]}
+    %__MODULE__{size: opts[:size], filler: opts[:filler]}
   end
 
   @doc """
@@ -19,14 +19,14 @@ defmodule Posexional.Field.Empty do
 
   ## Examples
 
-      iex> Posexional.Field.Empty.write(%Posexional.Field.Empty{filler: ?-, size: 10})
+      iex> #{__MODULE__}.write(%Posexional.Field.Empty{filler: ?-, size: 10})
       "----------"
 
-      iex> Posexional.Field.Empty.write(%Posexional.Field.Empty{filler: ?\\s, size: 2})
+      iex> #{__MODULE__}.write(%Posexional.Field.Empty{filler: ?\\s, size: 2})
       "  "
   """
-  @spec write(%Field.Empty{}) :: binary
-  def write(%Field.Empty{filler: filler, size: size}) do
+  @spec write(t()) :: String.t()
+  def write(%__MODULE__{filler: filler, size: size}) do
     String.duplicate(to_string([filler]), size)
   end
 end

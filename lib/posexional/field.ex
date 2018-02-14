@@ -9,32 +9,33 @@ defmodule Posexional.Field do
 
   ## Examples
 
-      iex> Posexional.Field.positionalize("test",
+      iex> #{__MODULE__}.positionalize("test",
       ...>   %{alignment: :left, size: 10, filler: ?\\s})
       "test      "
 
-      iex> Posexional.Field.positionalize("test",
+      iex> #{__MODULE__}.positionalize("test",
       ...>   %{alignment: :right, size: 10, filler: ?\\s})
       "      test"
 
-      iex> Posexional.Field.positionalize("test",
+      iex> #{__MODULE__}.positionalize("test",
       ...>   %{alignment: :right, size: 5, filler: ?\\s})
       " test"
 
-      iex> Posexional.Field.positionalize("test",
+      iex> #{__MODULE__}.positionalize("test",
       ...>   %{alignment: :right, size: 5, filler: ?-})
       "-test"
 
-      iex> Posexional.Field.positionalize("testtest",
+      iex> #{__MODULE__}.positionalize("testtest",
       ...>   %{alignment: :right, size: 5, filler: ?-})
       "testt"
   """
-  @spec positionalize(binary, map) :: binary
+  @spec positionalize(String.t(), map()) :: String.t()
   def positionalize(value, %{alignment: :left, size: size, filler: filler}) do
     value
     |> String.pad_trailing(size, filler_to_list_of_string(filler))
     |> String.slice(0, size)
   end
+
   def positionalize(value, %{alignment: :right, size: size, filler: filler}) do
     value
     |> String.pad_leading(size, filler_to_list_of_string(filler))
@@ -42,8 +43,7 @@ defmodule Posexional.Field do
   end
 
   def depositionalize(content, %{filler: filler}) do
-    content
-    |> nil_if_empty(filler)
+    nil_if_empty(content, filler)
   end
 
   defp filler_to_list_of_string(filler) do
@@ -54,6 +54,7 @@ defmodule Posexional.Field do
   nil if the value is an empty string, or a string containing only the filler
   """
   def nil_if_empty("", _), do: nil
+
   def nil_if_empty(v, filler) do
     if contains_only?(v, filler) do
       nil
@@ -67,7 +68,7 @@ defmodule Posexional.Field do
   """
   def contains_only?(v, filler) do
     v
-    |> String.to_charlist
+    |> String.to_charlist()
     |> Enum.all?(&(&1 === filler))
   end
 end

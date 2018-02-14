@@ -11,7 +11,7 @@ defmodule PosexionalRow do
   defmacro __using__(_opts) do
     quote do
       import unquote(__MODULE__)
-      Module.register_attribute __MODULE__, :fields, accumulate: true
+      Module.register_attribute(__MODULE__, :fields, accumulate: true)
       @name __MODULE__
       @guesser :never
       @separator ""
@@ -23,7 +23,12 @@ defmodule PosexionalRow do
   defmacro __before_compile__(_env) do
     quote do
       def get_row do
-        Posexional.Row.new(@name, Enum.reverse(@fields), row_guesser: @guesser, separator: @separator)
+        Posexional.Row.new(
+          @name,
+          Enum.reverse(@fields),
+          row_guesser: @guesser,
+          separator: @separator
+        )
       end
     end
   end
@@ -96,9 +101,9 @@ defmodule PosexionalRow do
   """
   defmacro import_fields_from(module_name) do
     quote do
-      Enum.each unquote(module_name).get_row.fields, fn field ->
+      Enum.each(unquote(module_name).get_row.fields, fn field ->
         @fields field
-      end
+      end)
     end
   end
 end

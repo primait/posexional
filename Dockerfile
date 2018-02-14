@@ -1,11 +1,19 @@
-FROM msaraiva/elixir-dev:1.2.4
+FROM elixir:1.6
 
-#RUN sed -i -e 's/v3\.3/edge/g' /etc/apk/repositories
-RUN apk -Uuv add erlang-xmerl mysql-client git openssh-client \
-    groff less python py-pip && \
-    pip install awscli && \
-    apk --purge -v del py-pip && \
-    rm -rf /var/cache/apk/*
+RUN apt-get update && apt-get install -qqy unzip \
+                     libncurses5 \
+                     groff \
+                     less \
+                     curl \
+                     tar \
+                     gzip \
+                     vim \
+                     tzdata && \
+    cp /usr/share/zoneinfo/UTC /etc/localtime && \
+    echo "Etc/UTC" > /etc/timezone && \
+    apt-get purge -y unzip \
+                    wget && \
+    rm -r /var/lib/apt/lists/*
 
 WORKDIR /code
 RUN mix local.hex --force
