@@ -77,6 +77,26 @@ defmodule PosexionalTest do
     assert [test: [code: "0001", prog: 1], test: [code: "0002", prog: 2]] === Posexional.read(file, "0001001\n0002002")
   end
 
+  test "read a file with a progressive number filled with white spaces and outputs a keyword list with progressive number field" do
+    fields = [
+      Field.Value.new(:code, 4, filler: ?0, alignment: :right),
+      Field.ProgressiveNumber.new(:prog, 3)
+    ]
+    row = Row.new(:test, fields, row_guesser: :always)
+    file = File.new([row])
+    assert [test: [code: "0001", prog: 1], test: [code: "0002", prog: 2]] === Posexional.read(file, "0001  1\n0002  2")
+  end
+
+  test "read a file with a progressive number filled with white spaces and left aligned and outputs a keyword list with progressive number field" do
+    fields = [
+      Field.Value.new(:code, 4, filler: ?0, alignment: :left),
+      Field.ProgressiveNumber.new(:prog, 3)
+    ]
+    row = Row.new(:test, fields, row_guesser: :always)
+    file = File.new([row])
+    assert [test: [code: "0001", prog: 1], test: [code: "0002", prog: 2]] === Posexional.read(file, "0001  1\n0002  2")
+  end
+
   test "read a file and outputs a keyword list with empty field" do
     fields = [
       Field.Value.new(:code, 4, filler: ?0, alignment: :right),
