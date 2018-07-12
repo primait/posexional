@@ -5,16 +5,15 @@ defmodule Posexional.Row do
 
   alias Posexional.Row
   alias Posexional.Field
-  alias Posexional.Protocol.{FieldName,FieldLength,FieldSize,FieldWrite,FieldRead}
+  alias Posexional.Protocol.{FieldName, FieldLength, FieldSize, FieldWrite, FieldRead}
   import Enum
 
-  defstruct \
-    name: nil,
-    fields: [],
-    separator: "",
-    row_guesser: :never
+  defstruct name: nil,
+            fields: [],
+            separator: "",
+            row_guesser: :never
 
-  @spec new(atom, [], Keyword.t) :: %Row{}
+  @spec new(atom, [], Keyword.t()) :: %Row{}
   def new(name, fields, opts \\ []) do
     struct!(Row, Keyword.merge([name: name, fields: fields], opts))
   end
@@ -32,11 +31,12 @@ defmodule Posexional.Row do
 
   @spec manage_counters(%Row{}, [{atom, pid}]) :: %Row{}
   def manage_counters(row = %Posexional.Row{fields: fields}, counters) do
-    new_fields = fields
-    |> Stream.map(fn
-      f = %Field.ProgressiveNumber{name: name} -> %{f | counter: Keyword.get(counters, name)}
-      f -> f
-    end)
+    new_fields =
+      fields
+      |> Stream.map(fn
+        f = %Field.ProgressiveNumber{name: name} -> %{f | counter: Keyword.get(counters, name)}
+        f -> f
+      end)
 
     %{row | fields: new_fields}
   end
@@ -69,14 +69,17 @@ defmodule Posexional.Row do
       ...>   |> Posexional.Row.write([])
       {:ok, "     "}
   """
-  @spec write(%Row{}, Keyword.t) :: {atom, binary}
+  @spec write(%Row{}, Keyword.t()) :: {atom, binary}
   def write(%Row{fields: []}, _), do: {:ok, ""}
+
   def write(row = %Row{separator: separator}, values) do
     result = do_output(row, values)
+
     if all?(result, &valid?/1) do
-      {:ok, result
-        |> map(&(elem(&1, 1)))
-        |> join(separator)}
+      {:ok,
+       result
+       |> map(&elem(&1, 1))
+       |> join(separator)}
     else
       {:error, error_message(result)}
     end
@@ -84,7 +87,7 @@ defmodule Posexional.Row do
 
   defp do_output(%Row{fields: fields}, values) do
     fields
-    |> map(fn (field) ->
+    |> map(fn field ->
       {field, Keyword.get(values, FieldName.name(field), nil)}
     end)
     |> map(fn {field, value} ->
@@ -107,26 +110,31 @@ defmodule Posexional.Row do
   defp do_error_message([error]) do
     "error on the field #{elem(error, 1)}"
   end
+
   defp do_error_message(errors) do
-    field_names = errors
-    |> map(&(elem(&1, 1)))
-    |> join(", ")
+    field_names =
+      errors
+      |> map(&elem(&1, 1))
+      |> join(", ")
+
     "errors on fields #{field_names}"
   end
 
   @doc """
   read a positional file row and convert it back to a keyword list of values
   """
-  @spec read(%Row{}, binary) :: Keyword.t
+  @spec read(%Row{}, binary) :: Keyword.t()
   def read(%Row{name: name, fields: fields, separator: separator}, content) do
-    res = fields
-    |> reduce({[], content}, fn field, {list, content} ->
-      field_content = String.slice(content, 0, FieldSize.size(field))
-      {list ++ [{FieldName.name(field), FieldRead.read(field, field_content)}],
-       String.slice(content, (FieldSize.size(field) + String.length(separator))..-1)}
-    end)
-    |> elem(0)
-    |> filter(fn {k, _} -> not k in [:empty_field] end)
+    res =
+      fields
+      |> reduce({[], content}, fn field, {list, content} ->
+        field_content = String.slice(content, 0, FieldSize.size(field))
+
+        {list ++ [{FieldName.name(field), FieldRead.read(field, field_content)}],
+         String.slice(content, (FieldSize.size(field) + String.length(separator))..-1)}
+      end)
+      |> elem(0)
+      |> filter(fn {k, _} -> not (k in [:empty_field]) end)
 
     [{name, res}]
   end
@@ -169,6 +177,7 @@ defmodule Posexional.Row do
   def length(%Row{fields: fields}), do: do_lenght(0, fields)
 
   defp do_lenght(acc, []), do: acc
+
   defp do_lenght(acc, [field | other_fields]) do
     do_lenght(acc + FieldLength.length(field), other_fields)
   end
@@ -198,8 +207,9 @@ defmodule Posexional.Row do
   def offset(%Row{fields: []}, _), do: nil
   def offset(%Row{fields: fields}, field_name), do: do_offset(1, fields, field_name)
 
-  defp do_offset(_, [], field_name), do: raise ArgumentError, "the field #{field_name} doesn't exists"
+  defp do_offset(_, [], field_name), do: raise(ArgumentError, "the field #{field_name} doesn't exists")
   defp do_offset(acc, :ok, _), do: acc
+
   defp do_offset(acc, [field | other_fields], field_name) do
     if field_name === FieldName.name(field) do
       do_offset(acc, :ok, field_name)

@@ -5,8 +5,7 @@ defmodule Posexional.Field.FixedValue do
   """
   alias Posexional.Field
 
-  defstruct \
-    value: ""
+  defstruct value: ""
 
   def new(value) do
     %Field.FixedValue{value: value}

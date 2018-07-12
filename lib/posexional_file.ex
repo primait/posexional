@@ -11,8 +11,8 @@ defmodule PosexionalFile do
       import unquote(__MODULE__)
       import PosexionalRow
       @separator "\n"
-      Module.register_attribute __MODULE__, :rows, accumulate: true
-      Module.register_attribute __MODULE__, :fields, accumulate: true
+      Module.register_attribute(__MODULE__, :rows, accumulate: true)
+      Module.register_attribute(__MODULE__, :fields, accumulate: true)
       @before_compile unquote(__MODULE__)
     end
   end
@@ -37,7 +37,7 @@ defmodule PosexionalFile do
 
       def get_file do
         @rows
-        |> Enum.reverse
+        |> Enum.reverse()
         |> Posexional.File.new(@separator)
       end
     end
@@ -54,14 +54,16 @@ defmodule PosexionalFile do
       Module.delete_attribute(__MODULE__, :fields)
     end
   end
+
   defmacro row(name, guesser, do: body) do
     quote do
-      this_row = Posexional.Row.new(unquote(name), [], [row_guesser: unquote(guesser)])
+      this_row = Posexional.Row.new(unquote(name), [], row_guesser: unquote(guesser))
       unquote(body)
       @rows Posexional.Row.add_fields(this_row, Enum.reverse(@fields))
       Module.delete_attribute(__MODULE__, :fields)
     end
   end
+
   defmacro row(row_module) do
     quote do
       @rows unquote(row_module).get_row

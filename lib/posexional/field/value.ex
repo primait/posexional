@@ -4,16 +4,16 @@ defmodule Posexional.Field.Value do
   """
   alias Posexional.Field
 
-  defstruct \
-    name: nil,
-    size: nil,
-    filler: ?\s,
-    alignment: :left,
-    default: nil
+  defstruct name: nil,
+            size: nil,
+            filler: ?\s,
+            alignment: :left,
+            default: nil
 
-  @spec new(atom, integer, Keyword.t) :: %Posexional.Field.Value{}
+  @spec new(atom, integer, Keyword.t()) :: %Posexional.Field.Value{}
   def new(name, size, opts \\ []) do
     opts = Keyword.merge([name: name, size: size, filler: ?\s, alignment: :left, default: nil], opts)
+
     %Posexional.Field.Value{
       name: opts[:name],
       size: opts[:size],
@@ -53,20 +53,24 @@ defmodule Posexional.Field.Value do
   def write(%Field.Value{filler: filler, size: size, default: nil}, nil) do
     String.duplicate(to_string([filler]), size)
   end
+
   def write(field = %Field.Value{default: default}, nil) do
     default
     |> Field.positionalize(field)
   end
+
   def write(field = %Field.Value{size: size}, value) when is_binary(value) and byte_size(value) <= size do
     value
     |> Field.positionalize(field)
   end
+
   def write(%Field.Value{name: name}, value) when not is_binary(value) do
     raise "The value provided for the #{name} field doesn't seem to be a string"
   end
+
   def write(%Field.Value{name: name, size: size}, value) do
-    raise "The value #{ value } is too long for the #{ name } field. "
-       <> "The maximum size is #{size} while the value is #{byte_size(value)}"
+    raise "The value #{value} is too long for the #{name} field. " <>
+            "The maximum size is #{size} while the value is #{byte_size(value)}"
   end
 end
 

@@ -6,14 +6,15 @@ defmodule Posexional.File do
   alias Posexional.Field
   import Enum
 
-  defstruct \
-    rows: [],
-    separator: "\n"
+  defstruct rows: [],
+            separator: "\n"
 
   def new(rows, separator \\ nil)
+
   def new(rows, nil) do
     %Posexional.File{rows: rows, separator: "\n"}
   end
+
   def new(rows, separator) do
     %Posexional.File{rows: rows, separator: separator}
   end
@@ -35,7 +36,7 @@ defmodule Posexional.File do
       ...> )
       ** (RuntimeError) row ne not found
   """
-  @spec write(%Posexional.File{}, Keyword.t) :: binary
+  @spec write(%Posexional.File{}, Keyword.t()) :: binary
   def write(file = %Posexional.File{separator: separator}, values) do
     file
     |> manage_counters
@@ -43,30 +44,31 @@ defmodule Posexional.File do
     |> join(separator)
   end
 
-  @spec write_path!(%Posexional.File{}, Keyword.t, binary) :: binary
+  @spec write_path!(%Posexional.File{}, Keyword.t(), binary) :: binary
   def write_path!(file = %Posexional.File{separator: separator}, values, path) do
-    File.open(path, [:write], fn (handle) ->
+    File.open(path, [:write], fn handle ->
       file
       |> manage_counters
       |> get_lines(values)
       |> Stream.map(fn line ->
-        IO.write handle, line
-        IO.write handle, separator
+        IO.write(handle, line)
+        IO.write(handle, separator)
       end)
-      |> Stream.run
+      |> Stream.run()
     end)
   end
 
-  @spec read(%Posexional.File{}, binary) :: Keyword.t
+  @spec read(%Posexional.File{}, binary) :: Keyword.t()
   def read(%Posexional.File{separator: separator, rows: rows}, content) do
     content
     |> String.split(separator)
     |> filter(fn
       "" -> false
-      _  -> true
+      _ -> true
     end)
     |> flat_map(fn content ->
       row = guess_row(content, rows)
+
       if is_nil(row) do
         [content]
       else
@@ -75,7 +77,7 @@ defmodule Posexional.File do
     end)
   end
 
-  @spec get_lines(%Posexional.File{}, Keyword.t) :: []
+  @spec get_lines(%Posexional.File{}, Keyword.t()) :: []
   defp get_lines(file, values) do
     values
     |> Stream.map(fn {row_name, values} -> {find_row(file, row_name), row_name, values} end)
@@ -83,6 +85,7 @@ defmodule Posexional.File do
       if is_nil(row) do
         raise "row #{row_name} not found"
       end
+
       {:ok, out} = Row.write(row, values)
       out
     end)
@@ -96,18 +99,18 @@ defmodule Posexional.File do
   @spec manage_counters(%Posexional.File{}) :: %Posexional.File{}
   def manage_counters(file = %Posexional.File{rows: rows}) do
     counters = get_counters(file)
-    %{file | rows: Stream.map(rows, &(Row.manage_counters(&1, counters)))}
+    %{file | rows: Stream.map(rows, &Row.manage_counters(&1, counters))}
   end
 
   @spec get_counters(%Posexional.File{}) :: [{atom, pid}]
   def get_counters(%Posexional.File{rows: rows}) do
     rows
-    |> Stream.flat_map(&(&1.fields))
+    |> Stream.flat_map(& &1.fields)
     |> Stream.flat_map(fn
       %Field.ProgressiveNumber{name: name} -> [name]
       _ -> []
     end)
-    |> Stream.uniq
+    |> Stream.uniq()
     |> map(fn name ->
       {:ok, pid} = Agent.start_link(fn -> 1 end)
       {name, pid}
