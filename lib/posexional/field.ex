@@ -41,9 +41,28 @@ defmodule Posexional.Field do
     |> String.slice(0, size)
   end
 
+  @spec depositionalize(binary, map) :: binary
+  def depositionalize(content, %Posexional.Field.ProgressiveNumber{filler: filler} = field) do
+    content
+    |> nil_if_empty(filler)
+    |> remove_filler(field)
+  end
+
   def depositionalize(content, %{filler: filler}) do
     content
     |> nil_if_empty(filler)
+  end
+
+  defp remove_filler(content, %{filler: filler, alignment: :right}) do
+    String.replace_leading(content, filler_to_string(filler), "")
+  end
+
+  defp remove_filler(content, %{filler: filler, alignment: :left}) do
+    String.replace_trailing(content, filler_to_string(filler), "")
+  end
+
+  defp filler_to_string(filler) do
+    to_string([filler])
   end
 
   defp filler_to_list_of_string(filler) do
