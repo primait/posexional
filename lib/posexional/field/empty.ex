@@ -4,9 +4,8 @@ defmodule Posexional.Field.Empty do
   """
   alias Posexional.Field
 
-  defstruct \
-    size: nil,
-    filler: ?\s
+  defstruct size: nil,
+            filler: ?\s
 
   @spec new(integer, char) :: %Posexional.Field.Empty{}
   def new(size, opts \\ []) do

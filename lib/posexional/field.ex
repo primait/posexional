@@ -35,6 +35,7 @@ defmodule Posexional.Field do
     |> String.pad_trailing(size, filler_to_list_of_string(filler))
     |> String.slice(0, size)
   end
+
   def positionalize(value, %{alignment: :right, size: size, filler: filler}) do
     value
     |> String.pad_leading(size, filler_to_list_of_string(filler))
@@ -73,6 +74,7 @@ defmodule Posexional.Field do
   nil if the value is an empty string, or a string containing only the filler
   """
   def nil_if_empty("", _), do: nil
+
   def nil_if_empty(v, filler) do
     if contains_only?(v, filler) do
       nil
@@ -86,7 +88,7 @@ defmodule Posexional.Field do
   """
   def contains_only?(v, filler) do
     v
-    |> String.to_charlist
+    |> String.to_charlist()
     |> Enum.all?(&(&1 === filler))
   end
 end

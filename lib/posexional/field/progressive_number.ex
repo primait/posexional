@@ -4,12 +4,11 @@ defmodule Posexional.Field.ProgressiveNumber do
   """
   alias Posexional.Field
 
-  defstruct \
-    name: nil,
-    size: nil,
-    filler: ?\s,
-    alignment: :right,
-    counter: nil
+  defstruct name: nil,
+            size: nil,
+            filler: ?\s,
+            alignment: :right,
+            counter: nil
 
   @spec new(atom, integer, char) :: %Posexional.Field.ProgressiveNumber{}
   def new(name, size, opts \\ []) do
@@ -40,7 +39,7 @@ end
 
 defimpl Posexional.Protocol.FieldWrite, for: Posexional.Field.ProgressiveNumber do
   def write(field = %Posexional.Field.ProgressiveNumber{counter: counter}, _) do
-    Posexional.Field.ProgressiveNumber.write(field, Agent.get_and_update(counter, &({&1, &1 + 1})))
+    Posexional.Field.ProgressiveNumber.write(field, Agent.get_and_update(counter, &{&1, &1 + 1}))
   end
 end
 
@@ -48,8 +47,8 @@ defimpl Posexional.Protocol.FieldRead, for: Posexional.Field.ProgressiveNumber d
   def read(field, content) do
     content
     |> Posexional.Field.depositionalize(field)
-    |> Integer.parse
-    |> Tuple.to_list
+    |> Integer.parse()
+    |> Tuple.to_list()
     |> hd
   end
 end

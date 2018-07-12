@@ -8,26 +8,28 @@ defmodule Posexional.FileTest do
     @separator "||"
 
     row :test do
-      fixed_value "test"
+      fixed_value("test")
       value :test_value, 5, filler: ?-
-      progressive_number :test1, 3, filler: ?0
-      progressive_number :test2, 3, filler: ?0
+      progressive_number(:test1, 3, filler: ?0)
+      progressive_number(:test2, 3, filler: ?0)
     end
   end
 
-
   test "manage counters" do
-    assert "testtest-001001||test-----002002" === Posexional.FileTest.FileModule.write([test: [test_value: "test"], test: []])
+    assert "testtest-001001||test-----002002" ===
+             Posexional.FileTest.FileModule.write(test: [test_value: "test"], test: [])
   end
 
   test "value to long" do
-    assert_raise RuntimeError, "The value test value is too long for the test_value field. The maximum size is 5 while the value is 10", fn ->
-      Posexional.FileTest.FileModule.write([test: [test_value: "test value"], test: []])
-    end
+    assert_raise RuntimeError,
+                 "The value test value is too long for the test_value field. The maximum size is 5 while the value is 10",
+                 fn ->
+                   Posexional.FileTest.FileModule.write(test: [test_value: "test value"], test: [])
+                 end
   end
 
   test "progressive fields get_counters_names" do
-    assert match? [test1: _, test2: _], Posexional.File.get_counters(Posexional.FileTest.FileModule.get_file)
+    assert match?([test1: _, test2: _], Posexional.File.get_counters(Posexional.FileTest.FileModule.get_file()))
   end
 
   defmodule FileModuleWithGuesser do
@@ -36,20 +38,22 @@ defmodule Posexional.FileTest do
     @separator "||"
 
     row :test, :always do
-      fixed_value "te"
-      fixed_value "st"
+      fixed_value("te")
+      fixed_value("st")
       value :test_value, 5, filler: ?-
-      progressive_number :test1, 3, filler: ?0
-      progressive_number :test2, 3, filler: ?0
+      progressive_number(:test1, 3, filler: ?0)
+      progressive_number(:test2, 3, filler: ?0)
     end
   end
 
   test "parse a file works as expected" do
-    res = "testtest-001001||test-----002002"
-    |> Posexional.FileTest.FileModuleWithGuesser.read
+    res =
+      "testtest-001001||test-----002002"
+      |> Posexional.FileTest.FileModuleWithGuesser.read()
+
     assert [
-      test: [fixed_value: "te", fixed_value: "st", test_value: "test-", test1: 1, test2: 1],
-      test: [fixed_value: "te", fixed_value: "st", test_value: nil, test1: 2, test2: 2]
-    ] === res
+             test: [fixed_value: "te", fixed_value: "st", test_value: "test-", test1: 1, test2: 1],
+             test: [fixed_value: "te", fixed_value: "st", test_value: nil, test1: 2, test2: 2]
+           ] === res
   end
 end
