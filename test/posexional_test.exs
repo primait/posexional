@@ -74,7 +74,7 @@ defmodule PosexionalTest do
   test "read a file and outputs a keyword list" do
     row = Row.new(:test, [Field.Value.new(:code, 4, filler: ?0, alignment: :right)], row_guesser: :always)
     file = File.new([row])
-    assert [test: [code: "0001"], test: [code: "0002"]] === Posexional.read(file, "0001\n0002")
+    assert [test: [code: "1"], test: [code: "2"]] === Posexional.read(file, "0001\n0002")
   end
 
   test "read a file and outputs a keyword list with progressive number field" do
@@ -85,7 +85,7 @@ defmodule PosexionalTest do
 
     row = Row.new(:test, fields, row_guesser: :always)
     file = File.new([row])
-    assert [test: [code: "0001", prog: 1], test: [code: "0002", prog: 2]] === Posexional.read(file, "0001001\n0002002")
+    assert [test: [code: "1", prog: 1], test: [code: "2", prog: 2]] === Posexional.read(file, "0001001\n0002002")
   end
 
   test "read a file with a progressive number filled with white spaces and outputs a keyword list with progressive number field" do
@@ -96,7 +96,7 @@ defmodule PosexionalTest do
 
     row = Row.new(:test, fields, row_guesser: :always)
     file = File.new([row])
-    assert [test: [code: "0001", prog: 1], test: [code: "0002", prog: 2]] === Posexional.read(file, "0001  1\n0002  2")
+    assert [test: [code: "1", prog: 1], test: [code: "2", prog: 2]] === Posexional.read(file, "0001  1\n0002  2")
   end
 
   test "read a file with a progressive number filled with white spaces and left aligned and outputs a keyword list with progressive number field" do
@@ -120,7 +120,7 @@ defmodule PosexionalTest do
     row = Row.new(:test, fields, row_guesser: :always)
     file = File.new([row])
 
-    assert [test: [code: "0001", label: "test------"], test: [code: "0002", label: "label-----"]] ===
+    assert [test: [code: "1", label: "test"], test: [code: "2", label: "label"]] ===
              Posexional.read(file, "0001   test------\n0002   label-----")
   end
 
