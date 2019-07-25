@@ -43,7 +43,7 @@ defmodule Posexional.Field do
   end
 
   @spec depositionalize(binary, map) :: binary
-  def depositionalize(content, %{filler: filler} = field) do
+  def depositionalize(content, field = %{filler: filler}) do
     content
     |> remove_filler(field)
     |> nil_if_empty(filler)
