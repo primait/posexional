@@ -3,9 +3,9 @@ defmodule Posexional.Row do
   this module represent a row in a positional file
   """
 
-  alias Posexional.Row
   alias Posexional.Field
-  alias Posexional.Protocol.{FieldName, FieldLength, FieldSize, FieldWrite, FieldRead}
+  alias Posexional.Protocol.{FieldLength, FieldName, FieldRead, FieldSize, FieldWrite}
+  alias Posexional.Row
   import Enum
 
   defstruct name: nil,

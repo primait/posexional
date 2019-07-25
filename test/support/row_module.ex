@@ -1,4 +1,5 @@
 defmodule Posexional.Test.RowModule do
+  @moduledoc false
   use PosexionalRow
 
   name(__MODULE__)

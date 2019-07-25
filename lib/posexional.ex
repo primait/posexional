@@ -54,13 +54,13 @@ defmodule Posexional do
       ])
 
   In the first part we **define the structure** inside a module. We are not saying what the content or the number of
-  rows there will be, we are just saying that there is a row called :beatles with the structure declared by the fields
+  rows there will be, we are just saying that there is a row called :beatles with the structure declared by the fields.
 
   Then we can call BeatlesFile.write/1, we pass the data that should be written in the fields. **Just the relevant
   data**, The empty fields, the fixed values or the progressive number is managed by the library itself.
 
   The write/1 function accept a keyword list with the row name as key, and a keyword list of {field name, field value}
-  of data. If some data is bigger than the field size an error is thrown
+  of data. If some data is bigger than the field size an error is thrown.
 
   With the same exact module, we can even **read a positional file** by calling read/1 and passing
   a binary string of the file content.
@@ -94,12 +94,11 @@ defmodule Posexional do
 
   Now we are able to parse a positional file
 
-      "000B1    1AA01george----  !\n000B2    2AA01john------  !\n000B2    3AA01ringo-----  !\n000B2    4AA01paul------  !"
-      |> BeatlesFile.read
-      |> IO.puts
-
-  this is the output
-
+      iex>~s<000B1    1AA01george----  !
+      ...>000B2    2AA01john------  !
+      ...>000B2    3AA01ringo-----  !
+      ...>000B2    4AA01paul------  !>
+      ...>|> BeatlesFile.read()
       [beatles: [code: "B1", code: 1, fixed_value: "AA", fixed_value: "01",
         name: "george", fixed_value: "!"],
        beatles: [code: "B2", code: 2, fixed_value: "AA", fixed_value: "01",

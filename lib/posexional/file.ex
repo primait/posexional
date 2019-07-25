@@ -2,8 +2,8 @@ defmodule Posexional.File do
   @moduledoc """
   a Posexional.File is the main struct to manage a positional file
   """
-  alias Posexional.Row
   alias Posexional.Field
+  alias Posexional.Row
   import Enum
 
   defstruct rows: [],
