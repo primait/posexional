@@ -24,7 +24,7 @@ defmodule Posexional.RowTest do
 
   test "an unkonwn row do not match" do
     assert [
-             {Posexional.RowTest.RowModule, [fixed_value: "test", a: "A       ", progressive: 1]},
+             {Posexional.RowTest.RowModule, [fixed_value: "test", a: "A", progressive: 1]},
              "nono|A       |00002|-----"
            ] === Posexional.RowTest.FileModule.read("test|A       |00001|-----\nnono|A       |00002|-----")
   end
@@ -35,7 +35,7 @@ defmodule Posexional.RowTest do
 
   test "file module with imported row works" do
     assert [
-             {Posexional.RowTest.OtherRowModule, [fixed_value: "test", a: "A       ", progressive: 1]},
+             {Posexional.RowTest.OtherRowModule, [fixed_value: "test", a: "A", progressive: 1]},
              "nono|A       |00002|-----"
            ] === Posexional.RowTest.OtherFileModule.read("test|A       |00001|-----\nnono|A       |00002|-----")
   end
