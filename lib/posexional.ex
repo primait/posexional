@@ -123,7 +123,7 @@ defmodule Posexional do
   @doc """
   same as write/2, but with a path to a new file to write the result to
   """
-  @spec write_file!(%Posexional.File{}, Keyword.t(), binary) :: nil
+  @spec write_file!(%Posexional.File{}, Keyword.t(), binary) :: {:ok, any} | {:error, any}
   def write_file!(positional_file, values, path) do
     Posexional.File.write_path!(positional_file, values, path)
   end

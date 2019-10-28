@@ -7,7 +7,8 @@ defmodule Posexional.Field.Empty do
   defstruct size: nil,
             filler: ?\s
 
-  @spec new(integer, char) :: %Posexional.Field.Empty{}
+  @spec new(integer) :: %Posexional.Field.Empty{}
+  @spec new(integer, Keyword.t()) :: %Posexional.Field.Empty{}
   def new(size, opts \\ []) do
     opts = Keyword.merge([size: size, filler: ?\s], opts)
     %Posexional.Field.Empty{size: opts[:size], filler: opts[:filler]}

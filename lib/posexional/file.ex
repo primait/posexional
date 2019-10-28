@@ -42,7 +42,7 @@ defmodule Posexional.File do
     |> Enum.join(separator)
   end
 
-  @spec write_path!(%Posexional.File{}, Keyword.t(), binary) :: binary
+  @spec write_path!(%Posexional.File{}, Keyword.t(), binary) :: {:ok, any} | {:error, any}
   def write_path!(file = %Posexional.File{separator: separator}, values, path) do
     File.open(path, [:write], fn handle ->
       file
@@ -71,7 +71,7 @@ defmodule Posexional.File do
     end)
   end
 
-  @spec get_lines(%Posexional.File{}, Keyword.t()) :: []
+  @spec get_lines(%Posexional.File{}, Keyword.t()) :: Enumerable.t()
   defp get_lines(file, values) do
     values
     |> Stream.map(fn {row_name, values} -> {find_row(file, row_name), row_name, values} end)
@@ -111,7 +111,7 @@ defmodule Posexional.File do
     end)
   end
 
-  @spec guess_row(binary, [%Row{}]) :: %Row{}
+  @spec guess_row(binary, [%Row{}]) :: %Row{} | nil
   defp guess_row(content, rows) do
     Enum.find(rows, nil, fn
       %Row{row_guesser: :always} -> true
