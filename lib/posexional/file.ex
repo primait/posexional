@@ -56,7 +56,7 @@ defmodule Posexional.File do
     end)
   end
 
-  @spec read(%Posexional.File{}, binary) :: Keyword.t()
+  @spec read(%Posexional.File{}, binary) :: [tuple() | String.t()]
   def read(%Posexional.File{separator: separator, rows: rows}, content) do
     content
     |> String.split(separator, trim: true)
