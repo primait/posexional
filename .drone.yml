@@ -30,6 +30,7 @@ steps:
     environment:
       MIX_ENV: test
     commands:
+      - mix local.hex --force
       - mix deps.get
       - mix compile --all-warnings --warnings-as-errors
       - mix test
@@ -50,6 +51,7 @@ steps:
     environment:
       MIX_ENV: test
     commands:
+      - mix local.hex --force
       - mix deps.get
       - mix compile --all-warnings --warnings-as-errors
       - mix test
@@ -70,6 +72,7 @@ steps:
     environment:
       MIX_ENV: test
     commands:
+      - mix local.hex --force
       - mix deps.get
       - mix compile --all-warnings --warnings-as-errors
       - mix test
@@ -90,6 +93,7 @@ steps:
     environment:
       MIX_ENV: test
     commands:
+      - mix local.hex --force
       - mix deps.get
       - mix compile --all-warnings --warnings-as-errors
       - mix test
