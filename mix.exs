@@ -44,7 +44,7 @@ defmodule Posexional.Mixfile do
     [
       check: [
         "format --check-formatted mix.exs \"lib/**/*.{ex,exs}\" \"test/**/*.{ex,exs}\" \"priv/**/*.{ex,exs}\" \"config/**/*.{ex,exs}\"",
-        "credo",
+        "credo --strict",
         "dialyzer"
       ],
       "format.all": [

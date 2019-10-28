@@ -2,9 +2,7 @@ defmodule Posexional.File do
   @moduledoc """
   a Posexional.File is the main struct to manage a positional file
   """
-  alias Posexional.Row
-  alias Posexional.Field
-  import Enum
+  alias Posexional.{Field, Row}
 
   defstruct rows: [],
             separator: "\n"
@@ -41,7 +39,7 @@ defmodule Posexional.File do
     file
     |> manage_counters
     |> get_lines(values)
-    |> join(separator)
+    |> Enum.join(separator)
   end
 
   @spec write_path!(%Posexional.File{}, Keyword.t(), binary) :: binary
@@ -61,12 +59,8 @@ defmodule Posexional.File do
   @spec read(%Posexional.File{}, binary) :: Keyword.t()
   def read(%Posexional.File{separator: separator, rows: rows}, content) do
     content
-    |> String.split(separator)
-    |> filter(fn
-      "" -> false
-      _ -> true
-    end)
-    |> flat_map(fn content ->
+    |> String.split(separator, trim: true)
+    |> Enum.flat_map(fn content ->
       row = guess_row(content, rows)
 
       if is_nil(row) do
@@ -111,7 +105,7 @@ defmodule Posexional.File do
       _ -> []
     end)
     |> Stream.uniq()
-    |> map(fn name ->
+    |> Enum.map(fn name ->
       {:ok, pid} = Agent.start_link(fn -> 1 end)
       {name, pid}
     end)
@@ -119,7 +113,7 @@ defmodule Posexional.File do
 
   @spec guess_row(binary, [%Row{}]) :: %Row{}
   defp guess_row(content, rows) do
-    find(rows, nil, fn
+    Enum.find(rows, nil, fn
       %Row{row_guesser: :always} -> true
       %Row{row_guesser: :never} -> false
       %Row{row_guesser: row_guesser} when is_function(row_guesser) -> row_guesser.(content)
@@ -128,6 +122,6 @@ defmodule Posexional.File do
 
   @spec find_row(%Posexional.File{}, atom) :: %Row{}
   def find_row(%Posexional.File{rows: rows}, name) do
-    find(rows, nil, fn %Row{name: row_name} -> row_name === name end)
+    Enum.find(rows, nil, fn %Row{name: row_name} -> row_name == name end)
   end
 end

@@ -55,13 +55,11 @@ defmodule Posexional.Field.Value do
   end
 
   def write(field = %Field.Value{default: default}, nil) do
-    default
-    |> Field.positionalize(field)
+    Field.positionalize(default, field)
   end
 
   def write(field = %Field.Value{size: size}, value) when is_binary(value) and byte_size(value) <= size do
-    value
-    |> Field.positionalize(field)
+    Field.positionalize(value, field)
   end
 
   def write(%Field.Value{name: name}, value) when not is_binary(value) do

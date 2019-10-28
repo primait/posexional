@@ -1,14 +1,16 @@
 defmodule Posexional.Test.FileModule do
+  @moduledoc nil
+
   use PosexionalFile
 
   @separator "\n\r"
 
   row :test_inline do
     value :a, 8
-    progressive_number(10, filler: ?0)
-    progressive_number(10, filler: ?0)
-    empty(10, filler: ?-)
-    fixed_value("test")
+    progressive_number 10, filler: ?0
+    progressive_number 10, filler: ?0
+    empty 10, filler: ?-
+    fixed_value "test"
   end
 
   row :test_with_guesser, :always do
@@ -16,5 +18,5 @@ defmodule Posexional.Test.FileModule do
     value :g, 4, filler: ?e
   end
 
-  row(Posexional.Test.RowModule)
+  row Posexional.Test.RowModule
 end

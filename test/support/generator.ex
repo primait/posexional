@@ -1,4 +1,6 @@
 defmodule Posexional.Test.Generator do
+  @moduledoc nil
+
   alias Posexional.{Field, Row}
 
   def setup_file do

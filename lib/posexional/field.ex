@@ -84,6 +84,6 @@ defmodule Posexional.Field do
   def contains_only?(v, filler) do
     v
     |> String.to_charlist()
-    |> Enum.all?(&(&1 === filler))
+    |> Enum.all?(&(&1 == filler))
   end
 end

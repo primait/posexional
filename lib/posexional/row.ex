@@ -3,10 +3,8 @@ defmodule Posexional.Row do
   this module represent a row in a positional file
   """
 
-  alias Posexional.Row
-  alias Posexional.Field
-  alias Posexional.Protocol.{FieldName, FieldLength, FieldSize, FieldWrite, FieldRead}
-  import Enum
+  alias Posexional.{Field, Row}
+  alias Posexional.Protocol.{FieldLength, FieldName, FieldRead, FieldSize, FieldWrite}
 
   defstruct name: nil,
             fields: [],
@@ -25,15 +23,13 @@ defmodule Posexional.Row do
 
   @spec add_fields(%Row{}, []) :: %Row{}
   def add_fields(row, fields) do
-    fields
-    |> reduce(row, fn field, row -> add_field(row, field) end)
+    Enum.reduce(fields, row, fn field, row -> add_field(row, field) end)
   end
 
   @spec manage_counters(%Row{}, [{atom, pid}]) :: %Row{}
   def manage_counters(row = %Posexional.Row{fields: fields}, counters) do
     new_fields =
-      fields
-      |> Stream.map(fn
+      Stream.map(fields, fn
         f = %Field.ProgressiveNumber{name: name} -> %{f | counter: Keyword.get(counters, name)}
         f -> f
       end)
@@ -75,11 +71,11 @@ defmodule Posexional.Row do
   def write(row = %Row{separator: separator}, values) do
     result = do_output(row, values)
 
-    if all?(result, &valid?/1) do
+    if Enum.all?(result, &valid?/1) do
       {:ok,
        result
-       |> map(&elem(&1, 1))
-       |> join(separator)}
+       |> Enum.map(&elem(&1, 1))
+       |> Enum.join(separator)}
     else
       {:error, error_message(result)}
     end
@@ -87,10 +83,10 @@ defmodule Posexional.Row do
 
   defp do_output(%Row{fields: fields}, values) do
     fields
-    |> map(fn field ->
+    |> Enum.map(fn field ->
       {field, Keyword.get(values, FieldName.name(field), nil)}
     end)
-    |> map(fn {field, value} ->
+    |> Enum.map(fn {field, value} ->
       {:ok, FieldWrite.write(field, value)}
     end)
   end
@@ -103,7 +99,7 @@ defmodule Posexional.Row do
 
   defp error_message(results) do
     results
-    |> filter(&error?/1)
+    |> Enum.filter(&error?/1)
     |> do_error_message
   end
 
@@ -114,8 +110,8 @@ defmodule Posexional.Row do
   defp do_error_message(errors) do
     field_names =
       errors
-      |> map(&elem(&1, 1))
-      |> join(", ")
+      |> Enum.map(&elem(&1, 1))
+      |> Enum.join(", ")
 
     "errors on fields #{field_names}"
   end
@@ -127,14 +123,14 @@ defmodule Posexional.Row do
   def read(%Row{name: name, fields: fields, separator: separator}, content) do
     res =
       fields
-      |> reduce({[], content}, fn field, {list, content} ->
+      |> Enum.reduce({[], content}, fn field, {list, content} ->
         field_content = String.slice(content, 0, FieldSize.size(field))
 
         {list ++ [{FieldName.name(field), FieldRead.read(field, field_content)}],
          String.slice(content, (FieldSize.size(field) + String.length(separator))..-1)}
       end)
       |> elem(0)
-      |> filter(fn {k, _} -> not (k in [:empty_field]) end)
+      |> Enum.filter(fn {k, _} -> not (k in [:empty_field]) end)
 
     [{name, res}]
   end
@@ -156,7 +152,7 @@ defmodule Posexional.Row do
   """
   @spec find_field(%Row{}, atom) :: %Field.Value{}
   def find_field(%Row{fields: fields}, name) do
-    find(fields, nil, fn %Field.Value{name: field_name} -> field_name === name end)
+    Enum.find(fields, nil, fn %Field.Value{name: field_name} -> field_name == name end)
   end
 
   @doc """
@@ -211,7 +207,7 @@ defmodule Posexional.Row do
   defp do_offset(acc, :ok, _), do: acc
 
   defp do_offset(acc, [field | other_fields], field_name) do
-    if field_name === FieldName.name(field) do
+    if field_name == FieldName.name(field) do
       do_offset(acc, :ok, field_name)
     else
       do_offset(acc + FieldLength.length(field), other_fields, field_name)

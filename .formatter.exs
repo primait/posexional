@@ -1,6 +1,17 @@
 [
   inputs: ["{mix,.formatter}.exs", "{config,lib,test}/**/*.{ex,exs}"],
   locals_without_parens: [
+    # Posexional
+    empty: :*,
+    fixed_value: :*,
+    guesser: 1,
+    import_fields_from: 1,
+    name: 1,
+    progressive_number: :*,
+    row: :*,
+    separator: 1,
+    value: :*,
+
     # Formatter tests
     assert_format: 2,
     assert_format: 3,
