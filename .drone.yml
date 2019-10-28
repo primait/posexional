@@ -1,0 +1,155 @@
+---
+kind: pipeline
+name: default
+
+volumes:
+  - name: docker
+    host:
+      path: /var/run/docker.sock
+  - name: ecs
+    host:
+      path: /etc/profile.d/ecs-credentials-endpoint
+
+clone:
+  depth: 1
+
+steps:
+  - name: cache-restore
+    image: prima/drone-tools:1.15.0
+    volumes:
+      - name: ecs
+        path: /etc/profile.d/ecs-credentials-endpoint
+      - name: docker
+        path: /var/run/docker.sock
+    commands:
+      - . /etc/profile.d/ecs-credentials-endpoint
+      - cache-restore
+
+  - name: build-elixir-1-6
+    image: elixir:1.6.6
+    environment:
+      MIX_ENV: test
+    commands:
+      - mix deps.get
+      - mix compile --all-warnings --warnings-as-errors
+      - mix test
+    depends_on:
+      - cache-restore
+
+  - name: check-elixir-1-6
+    image: elixir:1.6.6
+    environment:
+      MIX_ENV: test
+    commands:
+      - mix check
+    depends_on:
+      - build-elixir-1-6
+
+  - name: build-elixir-1-7
+    image: elixir:1.7.4
+    environment:
+      MIX_ENV: test
+    commands:
+      - mix deps.get
+      - mix compile --all-warnings --warnings-as-errors
+      - mix test
+    depends_on:
+      - build-elixir-1-6
+
+  - name: check-elixir-1-7
+    image: elixir:1.7.4
+    environment:
+      MIX_ENV: test
+    commands:
+      - mix check
+    depends_on:
+      - build-elixir-1-7
+
+  - name: build-elixir-1-8
+    image: elixir:1.8.2
+    environment:
+      MIX_ENV: test
+    commands:
+      - mix deps.get
+      - mix compile --all-warnings --warnings-as-errors
+      - mix test
+    depends_on:
+      - build-elixir-1-7
+
+  - name: check-elixir-1-8
+    image: elixir:1.8.2
+    environment:
+      MIX_ENV: test
+    commands:
+      - mix check
+    depends_on:
+      - build-elixir-1-8
+
+  - name: build-elixir-1-9
+    image: elixir:1.9.2
+    environment:
+      MIX_ENV: test
+    commands:
+      - mix deps.get
+      - mix compile --all-warnings --warnings-as-errors
+      - mix test
+    depends_on:
+      - build-elixir-1-8
+
+  - name: check-elixir-1-9
+    image: elixir:1.9.2
+    environment:
+      MIX_ENV: test
+    commands:
+      - mix check
+    depends_on:
+      - build-elixir-1-9
+
+  - name: cache-save
+    image: prima/drone-tools:1.15.0
+    volumes:
+      - name: ecs
+        path: /etc/profile.d/ecs-credentials-endpoint
+      - name: docker
+        path: /var/run/docker.sock
+    commands:
+      - . /etc/profile.d/ecs-credentials-endpoint
+      - cache-save _build deps
+    depends_on:
+      - build-elixir-1-6
+      - build-elixir-1-7
+      - build-elixir-1-8
+      - build-elixir-1-9
+      - check-elixir-1-6
+      - check-elixir-1-7
+      - check-elixir-1-8
+      - check-elixir-1-9
+    when:
+      branch:
+        - master
+
+---
+kind: pipeline
+name: notify
+
+clone:
+  disable: true
+
+steps:
+  - name: notify_email
+    image: drillster/drone-email
+    environment:
+      PLUGIN_USERNAME:
+        from_secret: email_username
+      PLUGIN_PASSWORD:
+        from_secret: email_password
+    settings:
+      host: email-smtp.eu-west-1.amazonaws.com
+      from: noreply@prima.it
+
+trigger:
+  status:
+    - failure
+
+depends_on:
+  - default
