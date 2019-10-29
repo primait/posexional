@@ -34,7 +34,7 @@ steps:
       - mix deps.get
       - mix compile --all-warnings --warnings-as-errors
       - mix test
-      - mix check
+      - mix dialyzer--format=dialyzer
     depends_on:
       - cache-restore
 
