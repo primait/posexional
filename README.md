@@ -1,5 +1,7 @@
 # Posexional
 
+[![Build Status](https://drone-1.prima.it/api/badges/primait/posexional/status.svg)](https://drone-1.prima.it/primait/posexional)
+
 Elixir library for positional files
 
 ## Installation
