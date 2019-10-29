@@ -64,9 +64,6 @@ steps:
     depends_on:
       - elixir-1-8
       - elixir-1-9
-    when:
-      branch:
-        - master
 
 ---
 kind: pipeline
