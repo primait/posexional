@@ -9,11 +9,16 @@ defmodule Posexional.Mixfile do
       elixirc_paths: elixirc_paths(Mix.env()),
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
-      aliases: aliases(),
       deps: deps(),
-      description: "A library to manage positional files",
+      aliases: aliases(),
       package: package(),
-      docs: [main: "Posexional"]
+      description: "A library to manage positional files",
+      docs: [main: "Posexional"],
+      dialyzer: [
+        plt_add_apps: [:mix],
+        plt_add_deps: :transitive,
+        ignore_warnings: ".dialyzerignore"
+      ]
     ]
   end
 
