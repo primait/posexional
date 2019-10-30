@@ -45,7 +45,7 @@ defmodule PosexionalRow do
   @doc """
   sets the row matcher
   """
-  defmacro guesser func do
+  defmacro guesser(func) do
     quote do
       @guesser unquote(func)
     end
