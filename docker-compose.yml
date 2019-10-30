@@ -3,4 +3,3 @@ web:
   volumes:
     - .:/code
   working_dir: /code
-  mem_limit: 500m
