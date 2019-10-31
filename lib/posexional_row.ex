@@ -81,7 +81,7 @@ defmodule PosexionalRow do
   @doc """
   add a field with a fixed value
   """
-  defmacro fixed_value(v) do
+  defmacro fixed_value v do
     quote do
       @fields Field.FixedValue.new(unquote(v))
     end
@@ -90,7 +90,7 @@ defmodule PosexionalRow do
   @doc """
   add a field with a progressive_number value
   """
-  defmacro progressive_number(field_name, size, opts \\ []) do
+  defmacro progressive_number field_name, size, opts \\ [] do
     quote do
       @fields Field.ProgressiveNumber.new(unquote(field_name), unquote(size), unquote(opts))
     end

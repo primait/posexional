@@ -10,7 +10,8 @@ defmodule Posexional.Field.ProgressiveNumber do
             alignment: :right,
             counter: nil
 
-  @spec new(atom, integer, char) :: %Posexional.Field.ProgressiveNumber{}
+  @spec new(atom, integer) :: %Posexional.Field.ProgressiveNumber{}
+  @spec new(atom, integer, Keyword.t()) :: %Posexional.Field.ProgressiveNumber{}
   def new(name, size, opts \\ []) do
     opts = Keyword.merge([name: name, size: size, filler: ?\s, alignment: :right], opts)
 

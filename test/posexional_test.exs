@@ -52,14 +52,14 @@ defmodule PosexionalTest do
 
     assert "0000089920160524100000000000001    REINPIBD0899   \n" <>
              "0000089920160524100000000000002    REINPIBD0899   \n" <>
-             "0000089920160524100000000000003FINEREINPIBD0899   " === Posexional.write(file, values)
+             "0000089920160524100000000000003FINEREINPIBD0899   " == Posexional.write(file, values)
   end
 
   test "different separator" do
     row = Row.new(:test, [Field.Value.new(:code, 8, filler: ?0, alignment: :right)])
     file = File.new([row], "\n\r")
     res = Posexional.write(file, test: [code: "1"], test: [code: "2"])
-    assert "00000001\n\r00000002" === res
+    assert "00000001\n\r00000002" == res
   end
 
   test "invalid row name raises a RuntimeError" do
@@ -74,7 +74,7 @@ defmodule PosexionalTest do
   test "read a file and outputs a keyword list" do
     row = Row.new(:test, [Field.Value.new(:code, 4, filler: ?0, alignment: :right)], row_guesser: :always)
     file = File.new([row])
-    assert [test: [code: "1"], test: [code: "2"]] === Posexional.read(file, "0001\n0002")
+    assert [test: [code: "1"], test: [code: "2"]] == Posexional.read(file, "0001\n0002")
   end
 
   test "read a file and outputs a keyword list with progressive number field" do
@@ -85,7 +85,7 @@ defmodule PosexionalTest do
 
     row = Row.new(:test, fields, row_guesser: :always)
     file = File.new([row])
-    assert [test: [code: "1", prog: 1], test: [code: "2", prog: 2]] === Posexional.read(file, "0001001\n0002002")
+    assert [test: [code: "1", prog: 1], test: [code: "2", prog: 2]] == Posexional.read(file, "0001001\n0002002")
   end
 
   test "read a file with a progressive number filled with white spaces and outputs a keyword list with progressive number field" do
@@ -96,7 +96,7 @@ defmodule PosexionalTest do
 
     row = Row.new(:test, fields, row_guesser: :always)
     file = File.new([row])
-    assert [test: [code: "1", prog: 1], test: [code: "2", prog: 2]] === Posexional.read(file, "0001  1\n0002  2")
+    assert [test: [code: "1", prog: 1], test: [code: "2", prog: 2]] == Posexional.read(file, "0001  1\n0002  2")
   end
 
   test "read a file with a progressive number filled with white spaces and left aligned and outputs a keyword list with progressive number field" do
@@ -107,7 +107,7 @@ defmodule PosexionalTest do
 
     row = Row.new(:test, fields, row_guesser: :always)
     file = File.new([row])
-    assert [test: [code: "0001", prog: 1], test: [code: "0002", prog: 2]] === Posexional.read(file, "0001  1\n0002  2")
+    assert [test: [code: "0001", prog: 1], test: [code: "0002", prog: 2]] == Posexional.read(file, "0001  1\n0002  2")
   end
 
   test "read a file and outputs a keyword list with empty field" do
@@ -120,13 +120,13 @@ defmodule PosexionalTest do
     row = Row.new(:test, fields, row_guesser: :always)
     file = File.new([row])
 
-    assert [test: [code: "1", label: "test"], test: [code: "2", label: "label"]] ===
+    assert [test: [code: "1", label: "test"], test: [code: "2", label: "label"]] ==
              Posexional.read(file, "0001   test------\n0002   label-----")
   end
 
   test "fixed value field" do
     fields = [Field.Value.new(:code, 4, filler: ?0, alignment: :right), Field.FixedValue.new("test")]
     file = File.new([Row.new(:test, fields)])
-    assert "0001test" === Posexional.write(file, test: [code: "0001"])
+    assert "0001test" == Posexional.write(file, test: [code: "0001"])
   end
 end

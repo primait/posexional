@@ -1,0 +1,92 @@
+---
+kind: pipeline
+name: default
+
+volumes:
+  - name: docker
+    host:
+      path: /var/run/docker.sock
+  - name: ecs
+    host:
+      path: /etc/profile.d/ecs-credentials-endpoint
+
+clone:
+  depth: 1
+
+steps:
+  - name: cache-restore
+    image: prima/drone-tools:1.15.0
+    volumes:
+      - name: ecs
+        path: /etc/profile.d/ecs-credentials-endpoint
+      - name: docker
+        path: /var/run/docker.sock
+    commands:
+      - . /etc/profile.d/ecs-credentials-endpoint
+      - cache-restore
+
+  - name: elixir-1-8
+    image: elixir:1.8.2
+    environment:
+      MIX_ENV: test
+    commands:
+      - mix local.hex --force
+      - mix deps.get
+      - mix compile --all-warnings --warnings-as-errors
+      - mix test
+      - mix dialyzer --format=dialyzer
+    depends_on:
+      - cache-restore
+
+  - name: elixir-1-9
+    image: elixir:1.9.2
+    environment:
+      MIX_ENV: test
+    commands:
+      - mix local.hex --force
+      - mix deps.get
+      - mix compile --all-warnings --warnings-as-errors
+      - mix test
+      - mix check
+    depends_on:
+      - elixir-1-8
+
+  - name: cache-save
+    image: prima/drone-tools:1.15.0
+    volumes:
+      - name: ecs
+        path: /etc/profile.d/ecs-credentials-endpoint
+      - name: docker
+        path: /var/run/docker.sock
+    commands:
+      - . /etc/profile.d/ecs-credentials-endpoint
+      - cache-save _build deps
+    depends_on:
+      - elixir-1-8
+      - elixir-1-9
+
+---
+kind: pipeline
+name: notify
+
+clone:
+  disable: true
+
+steps:
+  - name: notify_email
+    image: drillster/drone-email
+    environment:
+      PLUGIN_USERNAME:
+        from_secret: email_username
+      PLUGIN_PASSWORD:
+        from_secret: email_password
+    settings:
+      host: email-smtp.eu-west-1.amazonaws.com
+      from: noreply@prima.it
+
+trigger:
+  status:
+    - failure
+
+depends_on:
+  - default

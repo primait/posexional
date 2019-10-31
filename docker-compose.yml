@@ -1,6 +1,8 @@
-web:
-  build: .
-  volumes:
-    - .:/code
-  working_dir: /code
-  mem_limit: 500m
+version: "3"
+
+services:
+  web:
+    build: .
+    volumes:
+      - ".:/code"
+    working_dir: "/code"
