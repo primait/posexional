@@ -15,7 +15,3 @@ the package can be installed by adding posexional to your list of dependencies i
 ## Docs
 
 You can [read the docs online](https://hexdocs.pm/posexional/Posexional.html)
-
-## Contributing
-
-Please before submitting a Pull Request always run `mix test` and `mix check` and be sure that they complete without errors.
