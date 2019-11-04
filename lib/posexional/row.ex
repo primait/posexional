@@ -170,12 +170,12 @@ defmodule Posexional.Row do
   """
   @spec length(%Row{}) :: integer
   def length(%Row{fields: []}), do: 0
-  def length(%Row{fields: fields}), do: do_lenght(0, fields)
+  def length(%Row{fields: fields}), do: do_length(0, fields)
 
-  defp do_lenght(acc, []), do: acc
+  defp do_length(acc, []), do: acc
 
-  defp do_lenght(acc, [field | other_fields]) do
-    do_lenght(acc + FieldLength.length(field), other_fields)
+  defp do_length(acc, [field | other_fields]) do
+    do_length(acc + FieldLength.length(field), other_fields)
   end
 
   @doc """

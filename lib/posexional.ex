@@ -113,7 +113,7 @@ defmodule Posexional do
   """
 
   @doc """
-  write a positional file with the given stuct and data
+  write a positional file with the given struct and data
   """
   @spec write(%Posexional.File{}, Keyword.t()) :: binary
   def write(positional_file, values) do

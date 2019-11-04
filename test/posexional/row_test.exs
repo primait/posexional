@@ -84,7 +84,7 @@ defmodule Posexional.RowTest do
     assert "|" == RowModule.get_row().separator
   end
 
-  test "an unkonwn row do not match" do
+  test "an unknown row do not match" do
     assert [
              {RowModule, [fixed_value: "test", a: "A", progressive: 1]},
              "nono|A       |00002|-----"

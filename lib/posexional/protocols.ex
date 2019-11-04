@@ -1,5 +1,5 @@
 defprotocol Posexional.Protocol.FieldLength do
-  @doc "returns the field lenght"
+  @doc "returns the field length"
   def length(field)
 end
 
