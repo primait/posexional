@@ -58,17 +58,17 @@ defmodule Posexional.Field.Value do
     Field.positionalize(default, field)
   end
 
-  def write(field = %Field.Value{size: size}, value) when is_binary(value) and byte_size(value) <= size do
-    Field.positionalize(value, field)
+  def write(field = %Field.Value{name: name, size: size}, value) when is_binary(value) do
+    if String.length(value) <= size do
+      Field.positionalize(value, field)
+    else
+      raise "The value #{value} is too long for the #{name} field. " <>
+              "The maximum size is #{size} while the value is #{String.length(value)}"
+    end
   end
 
-  def write(%Field.Value{name: name}, value) when not is_binary(value) do
+  def write(%Field.Value{name: name}, _value) do
     raise "The value provided for the #{name} field doesn't seem to be a string"
-  end
-
-  def write(%Field.Value{name: name, size: size}, value) do
-    raise "The value #{value} is too long for the #{name} field. " <>
-            "The maximum size is #{size} while the value is #{byte_size(value)}"
   end
 end
 
