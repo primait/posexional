@@ -59,7 +59,11 @@ defmodule Posexional.File do
   @spec read(%Posexional.File{}, binary) :: [tuple() | String.t()]
   def read(%Posexional.File{separator: separator, rows: rows}, content) do
     content
-    |> String.split(separator, trim: true)
+    |> String.split(separator)
+    |> Enum.filter(fn
+      "" -> false
+      _ -> true
+    end)
     |> Enum.flat_map(fn content ->
       row = guess_row(content, rows)
 
