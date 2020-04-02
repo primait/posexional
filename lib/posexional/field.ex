@@ -43,10 +43,14 @@ defmodule Posexional.Field do
   end
 
   @spec depositionalize(binary, map) :: binary
-  def depositionalize(content, field = %{filler: filler}) do
+  def depositionalize(content, %Posexional.Field.ProgressiveNumber{filler: filler} = field) do
     content
-    |> remove_filler(field)
     |> nil_if_empty(filler)
+    |> remove_filler(field)
+  end
+
+  def depositionalize(content, %{filler: filler}) do
+    nil_if_empty(content, filler)
   end
 
   defp remove_filler(content, %{filler: filler, alignment: :right}) do
