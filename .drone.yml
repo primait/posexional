@@ -2,91 +2,289 @@
 kind: pipeline
 name: default
 
-volumes:
-  - name: docker
-    host:
-      path: /var/run/docker.sock
-  - name: ecs
-    host:
-      path: /etc/profile.d/ecs-credentials-endpoint
+platform:
+  os: linux
+  arch: amd64
 
 clone:
   depth: 1
 
 steps:
-  - name: cache-restore
-    image: prima/drone-tools:1.15.0
-    volumes:
-      - name: ecs
-        path: /etc/profile.d/ecs-credentials-endpoint
-      - name: docker
-        path: /var/run/docker.sock
-    commands:
-      - . /etc/profile.d/ecs-credentials-endpoint
-      - cache-restore
+- name: pre-start
+  image: prima/drone-tools:1.17.6
+  commands:
+  - pre-start-scripts
 
-  - name: elixir-1-8
-    image: elixir:1.8.2
-    environment:
-      MIX_ENV: test
-    commands:
-      - mix local.hex --force
-      - mix deps.get
-      - mix compile --all-warnings --warnings-as-errors
-      - mix test
-      - mix dialyzer --format=dialyzer
-    depends_on:
-      - cache-restore
+- name: cache-restore
+  image: prima/drone-tools:1.17.6
+  commands:
+  - . /etc/profile.d/ecs-credentials-endpoint
+  - cache-restore
+  volumes:
+  - name: ecs
+    path: /etc/profile.d/ecs-credentials-endpoint
+  - name: docker
+    path: /var/run/docker.sock
 
-  - name: elixir-1-9
-    image: elixir:1.9.2
-    environment:
-      MIX_ENV: test
-    commands:
-      - mix local.hex --force
-      - mix deps.get
-      - mix compile --all-warnings --warnings-as-errors
-      - mix test
-      - mix check
-    depends_on:
-      - elixir-1-8
+- name: linter-deploy-files
+  image: prima/drone-tools:1.17.6
+  commands:
+  - cfn-lint
+  - shellcheck deploy/deploy deploy/wait_for_stack
 
-  - name: cache-save
-    image: prima/drone-tools:1.15.0
-    volumes:
-      - name: ecs
-        path: /etc/profile.d/ecs-credentials-endpoint
-      - name: docker
-        path: /var/run/docker.sock
-    commands:
-      - . /etc/profile.d/ecs-credentials-endpoint
-      - cache-save _build deps
-    depends_on:
-      - elixir-1-8
-      - elixir-1-9
+- name: check-secrets
+  image: prima/drone-tools:1.17.6
+  commands:
+  - . /etc/profile.d/ecs-credentials-endpoint
+  - check-secrets-grants
+  volumes:
+  - name: ecs
+    path: /etc/profile.d/ecs-credentials-endpoint
+
+- name: build-image
+  image: prima/drone-tools:1.17.6
+  commands:
+  - sed -i 's/USER app/USER root/g' ./Dockerfile
+  - docker build -t prima/posexional-ci:1 ./
+  volumes:
+  - name: docker
+    path: /var/run/docker.sock
+  depends_on:
+  - cache-restore
+
+- name: elixir-1-8
+  image: elixir:1.8.2
+  commands:
+  - mix local.hex --force
+  - mix deps.get
+  - mix compile --all-warnings --warnings-as-errors
+  - mix test
+  - mix dialyzer --format=dialyzer
+  environment:
+    MIX_ENV: test
+  depends_on:
+  - cache-restore
+
+- name: elixir-1-9
+  image: elixir:1.9.2
+  commands:
+  - mix local.hex --force
+  - mix deps.get
+  - mix compile --all-warnings --warnings-as-errors
+  - mix test
+  - mix check
+  environment:
+    MIX_ENV: test
+  depends_on:
+  - elixir-1-8
+
+- name: cache-save
+  image: prima/drone-tools:1.17.6
+  commands:
+  - . /etc/profile.d/ecs-credentials-endpoint
+  - cache-save .gitignore
+  volumes:
+  - name: ecs
+    path: /etc/profile.d/ecs-credentials-endpoint
+  - name: docker
+    path: /var/run/docker.sock
+  when:
+    branch:
+    - master
+  depends_on:
+  - elixir-1-8
+  - elixir-1-9
+
+volumes:
+- name: docker
+  host:
+    path: /var/run/docker.sock
+- name: ecs
+  host:
+    path: /etc/profile.d/ecs-credentials-endpoint
+
+trigger:
+  event:
+  - push
 
 ---
 kind: pipeline
-name: notify
+name: deploy
+
+platform:
+  os: linux
+  arch: amd64
+
+clone:
+  depth: 1
+
+steps:
+- name: pre-start
+  image: prima/drone-tools:1.17.6
+  commands:
+  - pre-start-scripts
+
+- name: cache-restore
+  image: prima/drone-tools:1.17.6
+  commands:
+  - . /etc/profile.d/ecs-credentials-endpoint
+  - cache-restore
+  volumes:
+  - name: ecs
+    path: /etc/profile.d/ecs-credentials-endpoint
+  - name: docker
+    path: /var/run/docker.sock
+
+- name: check-secrets
+  image: prima/drone-tools:1.17.6
+  commands:
+  - . /etc/profile.d/ecs-credentials-endpoint
+  - check-secrets-grants
+  volumes:
+  - name: ecs
+    path: /etc/profile.d/ecs-credentials-endpoint
+
+- name: build-image
+  image: prima/drone-tools:1.17.6
+  commands:
+  - sed -i 's/USER app/USER root/g' ./Dockerfile
+  - docker build -t prima/posexional-ci:1 ./
+  volumes:
+  - name: docker
+    path: /var/run/docker.sock
+  depends_on:
+  - cache-restore
+
+- name: deploy-production
+  image: prima/posexional-ci:1
+  commands:
+  - . /etc/profile.d/ecs-credentials-endpoint
+  - ./deploy/deploy production ${DRONE_TAG}
+  environment:
+    HEX_AUTH_KEY:
+      from_secret: hex_auth_key
+    MIX_ENV: dev
+  volumes:
+  - name: ecs
+    path: /etc/profile.d/ecs-credentials-endpoint
+  depends_on:
+  - check-secrets
+  - build-image
+
+- name: wait-for-stack-production
+  image: prima/drone-tools:1.17.6
+  commands:
+  - . /etc/profile.d/ecs-credentials-endpoint
+  - ./deploy/wait_for_stack production ${DRONE_TAG}
+  volumes:
+  - name: ecs
+    path: /etc/profile.d/ecs-credentials-endpoint
+  depends_on:
+  - deploy-production
+
+volumes:
+- name: docker
+  host:
+    path: /var/run/docker.sock
+- name: ecs
+  host:
+    path: /etc/profile.d/ecs-credentials-endpoint
+
+trigger:
+  event:
+  - tag
+
+---
+kind: pipeline
+name: email-failure
+
+platform:
+  os: linux
+  arch: amd64
 
 clone:
   disable: true
 
 steps:
-  - name: notify_email
-    image: drillster/drone-email
-    environment:
-      PLUGIN_USERNAME:
-        from_secret: email_username
-      PLUGIN_PASSWORD:
-        from_secret: email_password
-    settings:
-      host: email-smtp.eu-west-1.amazonaws.com
-      from: noreply@prima.it
+- name: email-failure
+  image: drillster/drone-email
+  settings:
+    from: noreply@prima.it
+    host: email-smtp.eu-west-1.amazonaws.com
+  environment:
+    PLUGIN_PASSWORD:
+      from_secret: email_password
+    PLUGIN_USERNAME:
+      from_secret: email_username
 
 trigger:
   status:
-    - failure
+  - failure
 
 depends_on:
-  - default
+- default
+- deploy
+
+---
+kind: pipeline
+name: notify-failure-production
+
+platform:
+  os: linux
+  arch: amd64
+
+clone:
+  disable: true
+
+steps:
+- name: slack-failure
+  image: plugins/slack
+  settings:
+    channel: deploy
+    template: "{{repo.name}} release {{build.tag}} fallita: {{build.link}}"
+    webhook:
+      from_secret: slack_deploy_alert_webhook
+
+trigger:
+  event:
+  - tag
+  status:
+  - failure
+
+depends_on:
+- deploy
+
+---
+kind: pipeline
+name: notify-success-production
+
+platform:
+  os: linux
+  arch: amd64
+
+clone:
+  disable: true
+
+steps:
+- name: slack-success
+  image: plugins/slack
+  settings:
+    channel: deploy
+    template: "{{repo.name}} release {{build.tag}} completata: {{build.link}}"
+    webhook:
+      from_secret: slack_deploy_alert_webhook
+
+trigger:
+  event:
+  - tag
+  status:
+  - success
+
+depends_on:
+- deploy
+
+---
+kind: signature
+hmac: 9289eaba2ad254819de4ea47bcf47713cd94ff9fe03c6f37038635f14ae711d4
+
+...
