@@ -26,12 +26,6 @@ steps:
   - name: docker
     path: /var/run/docker.sock
 
-- name: linter-deploy-files
-  image: prima/drone-tools:1.17.6
-  commands:
-  - cfn-lint
-  - shellcheck deploy/deploy deploy/wait_for_stack
-
 - name: check-secrets
   image: prima/drone-tools:1.17.6
   commands:
@@ -285,6 +279,6 @@ depends_on:
 
 ---
 kind: signature
-hmac: 9289eaba2ad254819de4ea47bcf47713cd94ff9fe03c6f37038635f14ae711d4
+hmac: 5ec377e65ed7771ecad27164cc1cebcfe31e45f3796a18ff61efb287fdbceaf1
 
 ...
