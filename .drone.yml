@@ -2,91 +2,139 @@
 kind: pipeline
 name: default
 
-volumes:
-  - name: docker
-    host:
-      path: /var/run/docker.sock
-  - name: ecs
-    host:
-      path: /etc/profile.d/ecs-credentials-endpoint
+platform:
+  os: linux
+  arch: amd64
 
 clone:
   depth: 1
 
 steps:
-  - name: cache-restore
-    image: prima/drone-tools:1.15.0
-    volumes:
-      - name: ecs
-        path: /etc/profile.d/ecs-credentials-endpoint
-      - name: docker
-        path: /var/run/docker.sock
-    commands:
-      - . /etc/profile.d/ecs-credentials-endpoint
-      - cache-restore
+- name: pre-start
+  image: prima/drone-tools:1.17.6
+  commands:
+  - pre-start-scripts
 
-  - name: elixir-1-8
-    image: elixir:1.8.2
-    environment:
-      MIX_ENV: test
-    commands:
-      - mix local.hex --force
-      - mix deps.get
-      - mix compile --all-warnings --warnings-as-errors
-      - mix test
-      - mix dialyzer --format=dialyzer
-    depends_on:
-      - cache-restore
+- name: cache-restore
+  image: prima/drone-tools:1.17.6
+  commands:
+  - . /etc/profile.d/ecs-credentials-endpoint
+  - cache-restore
+  volumes:
+  - name: ecs
+    path: /etc/profile.d/ecs-credentials-endpoint
+  - name: docker
+    path: /var/run/docker.sock
 
-  - name: elixir-1-9
-    image: elixir:1.9.2
-    environment:
-      MIX_ENV: test
-    commands:
-      - mix local.hex --force
-      - mix deps.get
-      - mix compile --all-warnings --warnings-as-errors
-      - mix test
-      - mix check
-    depends_on:
-      - elixir-1-8
+- name: check-secrets
+  image: prima/drone-tools:1.17.6
+  commands:
+  - . /etc/profile.d/ecs-credentials-endpoint
+  - check-secrets-grants
+  volumes:
+  - name: ecs
+    path: /etc/profile.d/ecs-credentials-endpoint
 
-  - name: cache-save
-    image: prima/drone-tools:1.15.0
-    volumes:
-      - name: ecs
-        path: /etc/profile.d/ecs-credentials-endpoint
-      - name: docker
-        path: /var/run/docker.sock
-    commands:
-      - . /etc/profile.d/ecs-credentials-endpoint
-      - cache-save _build deps
-    depends_on:
-      - elixir-1-8
-      - elixir-1-9
+- name: build-image
+  image: prima/drone-tools:1.17.6
+  commands:
+  - sed -i 's/USER app/USER root/g' ./Dockerfile
+  - docker build -t prima/posexional-ci:1 ./
+  volumes:
+  - name: docker
+    path: /var/run/docker.sock
+  depends_on:
+  - cache-restore
+
+- name: elixir-1-8
+  image: elixir:1.8.2
+  commands:
+  - mix local.hex --force
+  - mix deps.get
+  - mix compile --all-warnings --warnings-as-errors
+  - mix test
+  - mix dialyzer --format=dialyzer
+  environment:
+    MIX_ENV: test
+  depends_on:
+  - cache-restore
+
+- name: elixir-1-9
+  image: elixir:1.9.2
+  commands:
+  - mix local.hex --force
+  - mix deps.get
+  - mix compile --all-warnings --warnings-as-errors
+  - mix test
+  - mix check
+  environment:
+    MIX_ENV: test
+  depends_on:
+  - elixir-1-8
+
+- name: cache-save
+  image: prima/drone-tools:1.17.6
+  commands:
+  - . /etc/profile.d/ecs-credentials-endpoint
+  - cache-save .gitignore
+  volumes:
+  - name: ecs
+    path: /etc/profile.d/ecs-credentials-endpoint
+  - name: docker
+    path: /var/run/docker.sock
+  when:
+    branch:
+    - master
+  depends_on:
+  - elixir-1-8
+  - elixir-1-9
+
+volumes:
+- name: docker
+  host:
+    path: /var/run/docker.sock
+- name: ecs
+  host:
+    path: /etc/profile.d/ecs-credentials-endpoint
+
+trigger:
+  event:
+  - push
 
 ---
 kind: pipeline
-name: notify
+name: email-failure
+
+platform:
+  os: linux
+  arch: amd64
 
 clone:
   disable: true
 
 steps:
-  - name: notify_email
-    image: drillster/drone-email
-    environment:
-      PLUGIN_USERNAME:
-        from_secret: email_username
-      PLUGIN_PASSWORD:
-        from_secret: email_password
-    settings:
-      host: email-smtp.eu-west-1.amazonaws.com
-      from: noreply@prima.it
+- name: email-failure
+  image: drillster/drone-email
+  settings:
+    from: noreply@prima.it
+    host: email-smtp.eu-west-1.amazonaws.com
+  environment:
+    PLUGIN_PASSWORD:
+      from_secret: email_password
+    PLUGIN_USERNAME:
+      from_secret: email_username
 
 trigger:
+  event:
+  - push
   status:
-    - failure
+  - failure
 
 depends_on:
-  - default
+- default
+
+---
+kind: signature
+hmac: 04a7707f1332f7b717dfa03b640e9449e539429cba07092aabe411726fd0ee0b
+
+...
