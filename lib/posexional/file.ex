@@ -49,8 +49,8 @@ defmodule Posexional.File do
       |> manage_counters
       |> get_lines(values)
       |> Stream.map(fn line ->
-        IO.write(handle, line)
-        IO.write(handle, separator)
+        IO.binwrite(handle, line)
+        IO.binwrite(handle, separator)
       end)
       |> Stream.run()
     end)

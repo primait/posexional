@@ -31,6 +31,16 @@ defmodule Posexional.FileTest do
     assert match?([test1: _, test2: _], Posexional.File.get_counters(FileModule.get_file()))
   end
 
+  test "file encoding write" do
+    assert "testàÈìÒù001001||test-----002002" == FileModule.write(test: [test_value: "àÈìÒù"], test: [])
+  end
+
+  test "file encoding write_path" do
+    assert {:ok, :ok} == FileModule.write_file!([test: [test_value: "àÈìÒù"], test: []], "/tmp/tmp.txt")
+
+    assert "testàÈìÒù001001||test-----002002" == Elixir.File.read!("/tmp/tmp.txt")
+  end
+
   defmodule FileModuleWithGuesser do
     use PosexionalFile
 
