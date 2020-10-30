@@ -21,5 +21,6 @@
     # Errors tests
     assert_eval_raise: 3
   ],
+  inputs: ["lib/**/*.{ex,exs}", "test/**/*.{ex,exs}", "config/**/*.{ex,exs}"],
   line_length: 120
 ]

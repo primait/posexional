@@ -11,15 +11,19 @@ clone:
 
 steps:
 - name: pre-start
-  image: prima/drone-tools:1.17.6
+  image: 001575623345.dkr.ecr.eu-west-1.amazonaws.com/drone-tools:1.17.12
   commands:
   - pre-start-scripts
+  environment:
+    COUNTRY: it
 
 - name: cache-restore
-  image: prima/drone-tools:1.17.6
+  image: 001575623345.dkr.ecr.eu-west-1.amazonaws.com/drone-tools:1.17.12
   commands:
   - . /etc/profile.d/ecs-credentials-endpoint
   - cache-restore
+  environment:
+    COUNTRY: it
   volumes:
   - name: ecs
     path: /etc/profile.d/ecs-credentials-endpoint
@@ -27,7 +31,7 @@ steps:
     path: /var/run/docker.sock
 
 - name: check-secrets
-  image: prima/drone-tools:1.17.6
+  image: 001575623345.dkr.ecr.eu-west-1.amazonaws.com/drone-tools:1.17.12
   commands:
   - . /etc/profile.d/ecs-credentials-endpoint
   - check-secrets-grants
@@ -36,13 +40,15 @@ steps:
     path: /etc/profile.d/ecs-credentials-endpoint
 
 - name: build-image
-  image: prima/drone-tools:1.17.6
+  image: 001575623345.dkr.ecr.eu-west-1.amazonaws.com/drone-tools:1.17.12
   commands:
   - sed -i 's/USER app/USER root/g' ./Dockerfile
   - docker build -t prima/posexional-ci:1 ./
   volumes:
   - name: docker
     path: /var/run/docker.sock
+  - name: docker-conf
+    path: /root/.docker
   depends_on:
   - cache-restore
 
@@ -73,10 +79,12 @@ steps:
   - elixir-1-8
 
 - name: cache-save
-  image: prima/drone-tools:1.17.6
+  image: 001575623345.dkr.ecr.eu-west-1.amazonaws.com/drone-tools:1.17.12
   commands:
   - . /etc/profile.d/ecs-credentials-endpoint
   - cache-save .gitignore
+  environment:
+    COUNTRY: it
   volumes:
   - name: ecs
     path: /etc/profile.d/ecs-credentials-endpoint
@@ -96,6 +104,9 @@ volumes:
 - name: ecs
   host:
     path: /etc/profile.d/ecs-credentials-endpoint
+- name: docker-conf
+  host:
+    path: /home/ec2-user/.docker
 
 trigger:
   event:
@@ -135,6 +146,6 @@ depends_on:
 
 ---
 kind: signature
-hmac: 04a7707f1332f7b717dfa03b640e9449e539429cba07092aabe411726fd0ee0b
+hmac: 863557eab28ff61db4d971edfbd05587894f8ad5223d403d09f556ffb44b778b
 
 ...
