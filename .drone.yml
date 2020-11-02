@@ -11,14 +11,14 @@ clone:
 
 steps:
 - name: pre-start
-  image: 001575623345.dkr.ecr.eu-west-1.amazonaws.com/drone-tools:1.17.12
+  image: 001575623345.dkr.ecr.eu-west-1.amazonaws.com/drone-tools:1.17.16
   commands:
   - pre-start-scripts
   environment:
     COUNTRY: it
 
 - name: cache-restore
-  image: 001575623345.dkr.ecr.eu-west-1.amazonaws.com/drone-tools:1.17.12
+  image: 001575623345.dkr.ecr.eu-west-1.amazonaws.com/drone-tools:1.17.16
   commands:
   - . /etc/profile.d/ecs-credentials-endpoint
   - cache-restore
@@ -29,9 +29,11 @@ steps:
     path: /etc/profile.d/ecs-credentials-endpoint
   - name: docker
     path: /var/run/docker.sock
+  - name: docker-conf
+    path: /root/.docker
 
 - name: check-secrets
-  image: 001575623345.dkr.ecr.eu-west-1.amazonaws.com/drone-tools:1.17.12
+  image: 001575623345.dkr.ecr.eu-west-1.amazonaws.com/drone-tools:1.17.16
   commands:
   - . /etc/profile.d/ecs-credentials-endpoint
   - check-secrets-grants
@@ -40,7 +42,7 @@ steps:
     path: /etc/profile.d/ecs-credentials-endpoint
 
 - name: build-image
-  image: 001575623345.dkr.ecr.eu-west-1.amazonaws.com/drone-tools:1.17.12
+  image: 001575623345.dkr.ecr.eu-west-1.amazonaws.com/drone-tools:1.17.16
   commands:
   - sed -i 's/USER app/USER root/g' ./Dockerfile
   - docker build -t prima/posexional-ci:1 ./
@@ -79,7 +81,7 @@ steps:
   - elixir-1-8
 
 - name: cache-save
-  image: 001575623345.dkr.ecr.eu-west-1.amazonaws.com/drone-tools:1.17.12
+  image: 001575623345.dkr.ecr.eu-west-1.amazonaws.com/drone-tools:1.17.16
   commands:
   - . /etc/profile.d/ecs-credentials-endpoint
   - cache-save .gitignore
@@ -90,6 +92,8 @@ steps:
     path: /etc/profile.d/ecs-credentials-endpoint
   - name: docker
     path: /var/run/docker.sock
+  - name: docker-conf
+    path: /root/.docker
   when:
     branch:
     - master
@@ -146,6 +150,6 @@ depends_on:
 
 ---
 kind: signature
-hmac: 863557eab28ff61db4d971edfbd05587894f8ad5223d403d09f556ffb44b778b
+hmac: 99a931f877ad17f54b834b056a9009f2e21bfe114499679bfbe726f46a5d83fb
 
 ...
