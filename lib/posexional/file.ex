@@ -42,18 +42,19 @@ defmodule Posexional.File do
     |> Enum.join(separator)
   end
 
-  @spec write_path!(%Posexional.File{}, Keyword.t(), binary) :: {:ok, any} | {:error, any}
+  @spec write_path!(%Posexional.File{}, Keyword.t(), binary) :: {:ok, binary} | {:error, any}
   def write_path!(file = %Posexional.File{separator: separator}, values, path) do
-    File.open(path, [:write], fn handle ->
-      file
-      |> manage_counters
-      |> get_lines(values)
-      |> Stream.map(fn line ->
-        IO.write(handle, line)
-        IO.write(handle, separator)
-      end)
-      |> Stream.run()
-    end)
+    with {:ok, _} <-
+           File.open(path, [:write], fn handle ->
+             file
+             |> manage_counters
+             |> get_lines(values)
+             |> Stream.intersperse(separator)
+             |> Stream.each(&IO.binwrite(handle, &1))
+             |> Stream.run()
+           end) do
+      {:ok, path}
+    end
   end
 
   @spec read(%Posexional.File{}, binary) :: [tuple() | String.t()]
