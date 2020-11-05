@@ -80,6 +80,19 @@ steps:
   depends_on:
   - elixir-1-8
 
+- name: elixir-1-10
+  image: elixir:1.10.3
+  commands:
+  - mix local.hex --force
+  - mix deps.get
+  - mix compile --all-warnings --warnings-as-errors
+  - mix test
+  - mix check
+  environment:
+    MIX_ENV: test
+  depends_on:
+  - elixir-1-9  
+
 - name: cache-save
   image: 001575623345.dkr.ecr.eu-west-1.amazonaws.com/drone-tools:1.17.16
   commands:
