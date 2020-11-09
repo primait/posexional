@@ -4,7 +4,7 @@ defmodule Posexional.Mixfile do
   def project do
     [
       app: :posexional,
-      version: "0.5.1",
+      version: "0.5.4",
       elixir: "~> 1.8",
       elixirc_paths: elixirc_paths(Mix.env()),
       build_embedded: Mix.env() == :prod,
