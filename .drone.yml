@@ -66,7 +66,7 @@ steps:
   - cache-restore
 
 - name: elixir-1-8
-  image: elixir:1.8.2
+  image: 595659439703.dkr.ecr.eu-west-1.amazonaws.com/elixir-official:1.8.2
   commands:
   - mix local.hex --force
   - mix deps.get
@@ -79,7 +79,7 @@ steps:
   - cache-restore
 
 - name: elixir-1-9
-  image: elixir:1.9.2
+  image: 595659439703.dkr.ecr.eu-west-1.amazonaws.com/elixir-official:1.9.2
   commands:
   - mix local.hex --force
   - mix deps.get
@@ -140,7 +140,7 @@ clone:
 
 steps:
 - name: email-failure
-  image: drillster/drone-email
+  image: 595659439703.dkr.ecr.eu-west-1.amazonaws.com/drone-email
   settings:
     from: noreply@prima.it
     host: email-smtp.eu-west-1.amazonaws.com
@@ -161,6 +161,6 @@ depends_on:
 
 ---
 kind: signature
-hmac: c065571c5a8813f86b9ee83f387f76333bbb9efb04c5b13414aeb62f39fb9f55
+hmac: 4ea937d760aecd54321925dd92bd817179b6d6adf48979a919779c87ae886a80
 
 ...
