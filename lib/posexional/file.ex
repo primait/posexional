@@ -7,6 +7,13 @@ defmodule Posexional.File do
   defstruct rows: [],
             separator: "\n"
 
+  @type row :: any
+
+  @type t :: %{
+          rows: [row],
+          separator: String.t()
+        }
+
   def new(rows, separator \\ nil)
 
   def new(rows, nil) do
@@ -22,13 +29,13 @@ defmodule Posexional.File do
 
   ## Examples
 
-      iex> Posexional.File.write(
+      iex> write(
       ...>   Posexional.File.new([ Posexional.Row.new(:row_test, [ Posexional.Field.Value.new(:test1, 5) ]) ]),
       ...>   [row_test: [test1: "test"], row_test: [test1: "t"]]
       ...> )
       "test \\nt    "
 
-      iex> Posexional.File.write(
+      iex> write(
       ...>   Posexional.File.new([ Posexional.Row.new(:row_test, [ Posexional.Field.Value.new(:test1, 5) ]) ]),
       ...>   [row_test: [test1: "test"], ne: [test1: "t"]]
       ...> )
@@ -75,6 +82,34 @@ defmodule Posexional.File do
       end
     end)
   end
+
+  @spec stream(Enumerable.t(), %Posexional.File{}) :: Enumerable.t()
+  def stream(str, _file = %{separator: separator, rows: rows}) do
+    str
+    |> Stream.concat([separator])
+    |> Stream.transform("", &stream_split(&1, &2, separator))
+    |> Stream.reject(&match?("", &1))
+    |> Stream.flat_map(&to_rows(&1, rows))
+  end
+
+  defp stream_split(bin, acc, separator) do
+    {remaining, splitted} =
+      acc
+      |> Kernel.<>(bin)
+      |> String.split(separator)
+      |> List.pop_at(-1)
+
+    {splitted, remaining}
+  end
+
+  defp to_rows(content, rows),
+    do: binary_to_rows(content, guess_row(content, rows))
+
+  defp binary_to_rows(content, nil),
+    do: [content]
+
+  defp binary_to_rows(content, row),
+    do: Row.read(row, content)
 
   @spec get_lines(%Posexional.File{}, Keyword.t()) :: Enumerable.t()
   defp get_lines(file, values) do

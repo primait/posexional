@@ -1,6 +1,6 @@
 defmodule Posexional.FileTest do
   use Posexional.Case, async: true
-  doctest PosexionalFile
+  doctest PosexionalFile, import: true
 
   defmodule FileModule do
     use PosexionalFile
