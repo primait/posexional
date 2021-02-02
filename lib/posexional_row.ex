@@ -114,4 +114,13 @@ defmodule PosexionalRow do
       end)
     end
   end
+
+  @doc """
+  add a field
+  """
+  defmacro field(field_name, type, size, opts \\ []) do
+    quote do
+      @fields Field.Field.new(unquote(field_name), unquote(type), unquote(size), unquote(opts))
+    end
+  end
 end
