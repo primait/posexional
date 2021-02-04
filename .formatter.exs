@@ -11,6 +11,7 @@
     row: :*,
     separator: 1,
     value: :*,
+    field: :*,
 
     # Formatter tests
     assert_format: 2,

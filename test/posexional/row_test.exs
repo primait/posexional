@@ -89,8 +89,8 @@ defmodule Posexional.RowTest do
   defmodule StructRowFile do
     use PosexionalFile
 
-    row(Row1)
-    row(Row2)
+    row Row1
+    row Row2
   end
 
   test "fields_from to copy fields from another row" do

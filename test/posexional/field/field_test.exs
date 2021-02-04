@@ -6,14 +6,14 @@ defmodule Posexional.Field.FieldTest do
 
     guesser &__MODULE__.guesser/1
 
-    fixed_value("row1")
-    field(:id, :id, 3)
-    field(:binary_id, :binary_id, 3)
-    field(:integer, :integer, 2)
-    field(:float, :float, 6)
-    field(:boolean, :boolean, 5)
-    field(:string, :string, 4)
-    field(:binary, :binary, 4)
+    fixed_value "row1"
+    field :id, :id, 3
+    field :binary_id, :binary_id, 3
+    field :integer, :integer, 2
+    field :float, :float, 6
+    field :boolean, :boolean, 5
+    field :string, :string, 4
+    field :binary, :binary, 4
 
     def guesser("row1" <> _), do: true
     def guesser(_), do: false
@@ -24,16 +24,16 @@ defmodule Posexional.Field.FieldTest do
 
     guesser &__MODULE__.guesser/1
 
-    field(:custom, :custom, 4, parser: &String.to_atom/1)
-    field(:array, :array, 4, separator: "")
-    field(:list, :list, 7, separator: "|")
-    field(:decimal, :decimal, 8)
-    field(:date, :date, 8, format_in: "{0M}{0D}{YYYY}")
-    field(:time, :time, 8, format_in: "%H%M%S%f")
-    field(:time2, :time, 6, format_in: "%H%M%S")
-    field(:datetime, :datetime, 14, format_in: "%d%m%Y%H%M%S", timezone: "America/Sao_Paulo")
-    field(:naive_dt, :naive_datetime, 23, format_in: "%d/%m/%Y@%H:%M:%S.%L")
-    field(:utc_dt, :utc_datetime, 23, format_in: "%Y-%m-%d %H:%M:%S.%L")
+    field :custom, :custom, 4, parser: &String.to_atom/1
+    field :array, :array, 4, separator: ""
+    field :list, :list, 7, separator: "|"
+    field :decimal, :decimal, 8
+    field :date, :date, 8, format_in: "{0M}{0D}{YYYY}"
+    field :time, :time, 8, format_in: "%H%M%S%f"
+    field :time2, :time, 6, format_in: "%H%M%S"
+    field :datetime, :datetime, 14, format_in: "%d%m%Y%H%M%S", timezone: "America/Sao_Paulo"
+    field :naive_dt, :naive_datetime, 23, format_in: "%d/%m/%Y@%H:%M:%S.%L"
+    field :utc_dt, :utc_datetime, 23, format_in: "%Y-%m-%d %H:%M:%S.%L"
 
     def guesser("afoo" <> _), do: true
     def guesser(_), do: false
@@ -44,8 +44,8 @@ defmodule Posexional.Field.FieldTest do
 
     guesser &__MODULE__.guesser/1
 
-    fixed_value("row3")
-    field(:custom, :custom, 4)
+    fixed_value "row3"
+    field :custom, :custom, 4
 
     def guesser("row3" <> _), do: true
     def guesser(_), do: false
