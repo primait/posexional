@@ -133,9 +133,9 @@ defmodule Posexional.Row do
       |> elem(0)
       |> Enum.filter(fn {k, _} -> not (k in [:empty_field]) end)
 
-    if not is_nil(struct_module),
-      do: [struct(struct_module, res)],
-      else: [{name, res}]
+    if is_nil(struct_module),
+      do: [{name, res}],
+      else: [{name, struct(struct_module, res)}]
   end
 
   @doc """

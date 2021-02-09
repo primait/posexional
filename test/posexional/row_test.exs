@@ -144,6 +144,9 @@ defmodule Posexional.RowTest do
       "row1123\n" <>
         "afoo"
 
-    assert [%Posexional.RowTest.Row1{}, %Posexional.RowTest.Row2{}] = StructRowFile.read(content)
+    assert [
+             {Posexional.RowTest.Row1, %Posexional.RowTest.Row1{}},
+             {Posexional.RowTest.Row2, %Posexional.RowTest.Row2{}}
+           ] = StructRowFile.read(content)
   end
 end

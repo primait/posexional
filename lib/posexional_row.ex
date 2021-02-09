@@ -25,7 +25,7 @@ defmodule PosexionalRow do
     quote do
       if not is_nil(@struct_module) do
         defstruct @fields
-                  |> Enum.filter(&(&1.__struct__ in [Posexional.Field.Field, Posexional.Field.Value]))
+                  |> Enum.filter(&(&1.__struct__ in [Posexional.Field.TypedField, Posexional.Field.Value]))
                   |> Enum.map(&Map.get(&1, :name))
       end
 
@@ -120,7 +120,7 @@ defmodule PosexionalRow do
   """
   defmacro field(field_name, type, size, opts \\ []) do
     quote do
-      @fields Field.Field.new(unquote(field_name), unquote(type), unquote(size), unquote(opts))
+      @fields Field.TypedField.new(unquote(field_name), unquote(type), unquote(size), unquote(opts))
     end
   end
 end

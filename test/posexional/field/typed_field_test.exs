@@ -1,4 +1,4 @@
-defmodule Posexional.Field.FieldTest do
+defmodule Posexional.Field.TypedFieldTest do
   use Posexional.Case, async: true
 
   defmodule Row1 do
@@ -65,7 +65,7 @@ defmodule Posexional.Field.FieldTest do
         "afoo1234cat|dog123.45  01312021235959990745001209198807450031/12/2021@23:59:59.9992022-01-01 00:00:00.000"
 
     assert [
-             %Posexional.Field.FieldTest.Row1{
+             "Elixir.Posexional.Field.TypedFieldTest.Row1": %Posexional.Field.TypedFieldTest.Row1{
                binary: "Doe",
                binary_id: "ABA",
                boolean: false,
@@ -74,7 +74,7 @@ defmodule Posexional.Field.FieldTest do
                integer: 0,
                string: "John"
              },
-             %Posexional.Field.FieldTest.Row2{
+             "Elixir.Posexional.Field.TypedFieldTest.Row2": %Posexional.Field.TypedFieldTest.Row2{
                array: ["1", "2", "3", "4"],
                custom: :afoo,
                date: ~D[2021-01-31],
@@ -85,7 +85,7 @@ defmodule Posexional.Field.FieldTest do
                  hour: 7,
                  minute: 45,
                  second: 00,
-                 utc_offset: -10800,
+                 utc_offset: -10_800,
                  time_zone: "America/Sao_Paulo",
                  std_offset: 0,
                  zone_abbr: "-03"
