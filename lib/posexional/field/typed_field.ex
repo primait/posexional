@@ -27,14 +27,14 @@ defmodule Posexional.Field.TypedField do
 
   @type t :: %__MODULE__{}
 
-  @spec new(atom, integer, field_type, Keyword.t()) :: %Posexional.Field.TypedField{}
+  @spec new(atom(), field_type(), integer(), Keyword.t()) :: %Posexional.Field.TypedField{}
   def new(name, type, size, opts \\ []) do
     value = Value.new(name, size, opts)
 
     %__MODULE__{name: name, field_value: value, type: type, opts: opts}
   end
 
-  @spec parse!(String.t(), field_type, Keyword.t()) ::
+  @spec parse!(String.t(), field_type, map) ::
           integer()
           | String.t()
           | float()
