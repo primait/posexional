@@ -9,7 +9,8 @@ defmodule Posexional.Row do
   defstruct name: nil,
             fields: [],
             separator: "",
-            row_guesser: :never
+            row_guesser: :never,
+            struct_module: nil
 
   @spec new(atom, [], Keyword.t()) :: %Row{}
   def new(name, fields, opts \\ []) do
@@ -120,7 +121,7 @@ defmodule Posexional.Row do
   read a positional file row and convert it back to a keyword list of values
   """
   @spec read(%Row{}, binary) :: Keyword.t()
-  def read(%Row{name: name, fields: fields, separator: separator}, content) do
+  def read(%Row{name: name, fields: fields, separator: separator, struct_module: struct_module}, content) do
     res =
       fields
       |> Enum.reduce({[], content}, fn field, {list, content} ->
@@ -132,7 +133,9 @@ defmodule Posexional.Row do
       |> elem(0)
       |> Enum.filter(fn {k, _} -> not (k in [:empty_field]) end)
 
-    [{name, res}]
+    if is_nil(struct_module),
+      do: [{name, res}],
+      else: [{name, struct(struct_module, res)}]
   end
 
   @doc """

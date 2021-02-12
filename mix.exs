@@ -29,7 +29,7 @@ defmodule Posexional.Mixfile do
   defp elixirc_paths(_), do: ["lib"]
 
   def application do
-    [applications: [:logger]]
+    [applications: [:logger], extra_applications: [:timex]]
   end
 
   defp package do
@@ -42,6 +42,7 @@ defmodule Posexional.Mixfile do
 
   defp deps do
     [
+      {:timex, "~> 3.0"},
       {:credo, "~> 1.0", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.0.0-rc.7", only: [:dev, :test], runtime: false},
       {:ex_doc, "~> 0.21", only: :dev}

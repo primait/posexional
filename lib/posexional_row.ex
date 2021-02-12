@@ -8,13 +8,14 @@ defmodule PosexionalRow do
   @doc """
   add use Posexional on top of an elixir module to use macros to define fields
   """
-  defmacro __using__(_opts) do
+  defmacro __using__(opts \\ []) do
     quote do
       import unquote(__MODULE__)
       Module.register_attribute(__MODULE__, :fields, accumulate: true)
       @name __MODULE__
       @guesser :never
       @separator ""
+      @struct_module if Enum.member?(unquote(opts), :as_struct), do: __MODULE__
       @before_compile unquote(__MODULE__)
     end
   end
@@ -22,12 +23,19 @@ defmodule PosexionalRow do
   @doc false
   defmacro __before_compile__(_env) do
     quote do
+      if not is_nil(@struct_module) do
+        defstruct @fields
+                  |> Enum.filter(&(&1.__struct__ in [Posexional.Field.TypedField, Posexional.Field.Value]))
+                  |> Enum.map(&Map.get(&1, :name))
+      end
+
       def get_row do
         Posexional.Row.new(
           @name,
           Enum.reverse(@fields),
           row_guesser: @guesser,
-          separator: @separator
+          separator: @separator,
+          struct_module: @struct_module
         )
       end
     end
@@ -104,6 +112,15 @@ defmodule PosexionalRow do
       Enum.each(unquote(module_name).get_row.fields, fn field ->
         @fields field
       end)
+    end
+  end
+
+  @doc """
+  add a field
+  """
+  defmacro field(field_name, type, size, opts \\ []) do
+    quote do
+      @fields Field.TypedField.new(unquote(field_name), unquote(type), unquote(size), unquote(opts))
     end
   end
 end

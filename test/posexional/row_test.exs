@@ -64,6 +64,35 @@ defmodule Posexional.RowTest do
     row DefaultRowModule
   end
 
+  defmodule Row1 do
+    use PosexionalRow, [:as_struct]
+
+    guesser &__MODULE__.guesser/1
+
+    fixed_value "row1"
+    value :id, 3
+
+    def guesser("row1" <> _), do: true
+    def guesser(_), do: false
+  end
+
+  defmodule Row2 do
+    use PosexionalRow, [:as_struct]
+
+    guesser &__MODULE__.guesser/1
+
+    value :id, 4
+
+    def guesser(content), do: not String.starts_with?(content, "row1")
+  end
+
+  defmodule StructRowFile do
+    use PosexionalFile
+
+    row Row1
+    row Row2
+  end
+
   test "fields_from to copy fields from another row" do
     from_row = Row.new(:from, [Field.Value.new(:v1, 5), Field.Value.new(:v2, 5), Field.Value.new(:v3, 5)])
     to_row = Row.new(:to, [])
@@ -108,5 +137,16 @@ defmodule Posexional.RowTest do
 
   test "default is ignored if value is provided" do
     assert "defaultrow|B       " == DefaultFileModule.write(with_defaults: [a: "B"])
+  end
+
+  test "should parse a file as struct" do
+    content =
+      "row1123\n" <>
+        "afoo"
+
+    assert [
+             {Posexional.RowTest.Row1, %Posexional.RowTest.Row1{}},
+             {Posexional.RowTest.Row2, %Posexional.RowTest.Row2{}}
+           ] = StructRowFile.read(content)
   end
 end
