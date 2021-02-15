@@ -24,6 +24,23 @@ steps:
   depends_on:
   - git-clone
 
+- name: cache-restore
+  image: 595659439703.dkr.ecr.eu-west-1.amazonaws.com/drone-tools:1.17.16
+  commands:
+  - . /etc/profile.d/ecs-credentials-endpoint
+  - cache-restore
+  environment:
+    COUNTRY: it
+  volumes:
+  - name: ecs
+    path: /etc/profile.d/ecs-credentials-endpoint
+  - name: docker
+    path: /var/run/docker.sock
+  - name: docker-conf
+    path: /root/.docker
+  depends_on:
+  - git-clone
+
 - name: check-secrets
   image: 595659439703.dkr.ecr.eu-west-1.amazonaws.com/drone-tools:1.17.16
   commands:
@@ -46,12 +63,13 @@ steps:
   - name: docker-conf
     path: /root/.docker
   depends_on:
-  - git-clone
+  - cache-restore
 
 - name: elixir-1-9
   image: 595659439703.dkr.ecr.eu-west-1.amazonaws.com/elixir-official:1.9.2
   commands:
   - mix local.hex --force
+  - mix local.rebar --force
   - mix deps.get
   - mix compile --all-warnings --warnings-as-errors
   - mix test
@@ -59,12 +77,14 @@ steps:
   environment:
     MIX_ENV: test
   depends_on:
+  - cache-restore
   - build-image
 
 - name: elixir-1-10
   image: 595659439703.dkr.ecr.eu-west-1.amazonaws.com/elixir-official:1.10.4-1
   commands:
   - mix local.hex --force
+  - mix local.rebar --force
   - mix deps.get
   - mix compile --all-warnings --warnings-as-errors
   - mix test
@@ -78,6 +98,7 @@ steps:
   image: 595659439703.dkr.ecr.eu-west-1.amazonaws.com/elixir-official:1.11.2-1
   commands:
   - mix local.hex --force
+  - mix local.rebar --force
   - mix deps.get
   - mix compile --all-warnings --warnings-as-errors
   - mix test
