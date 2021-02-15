@@ -12,7 +12,7 @@ defmodule Posexional.Row do
             row_guesser: :never,
             struct_module: nil
 
-  @spec new(atom, [], Keyword.t()) :: %Row{}
+  @spec new(atom, [struct], Keyword.t()) :: %Row{}
   def new(name, fields, opts \\ []) do
     struct!(Row, Keyword.merge([name: name, fields: fields], opts))
   end

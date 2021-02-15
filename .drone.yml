@@ -65,23 +65,11 @@ steps:
   depends_on:
   - cache-restore
 
-- name: elixir-1-8
-  image: 595659439703.dkr.ecr.eu-west-1.amazonaws.com/elixir-official:1.8.2
-  commands:
-  - mix local.hex --force
-  - mix deps.get
-  - mix compile --all-warnings --warnings-as-errors
-  - mix test
-  - mix dialyzer --format=dialyzer
-  environment:
-    MIX_ENV: test
-  depends_on:
-  - cache-restore
-
 - name: elixir-1-9
-  image: 595659439703.dkr.ecr.eu-west-1.amazonaws.com/elixir-official:1.9.2
+  image: public.ecr.aws/prima/elixir-official:1.9.2
   commands:
   - mix local.hex --force
+  - mix local.rebar --force
   - mix deps.get
   - mix compile --all-warnings --warnings-as-errors
   - mix test
@@ -89,7 +77,37 @@ steps:
   environment:
     MIX_ENV: test
   depends_on:
-  - elixir-1-8
+  - cache-restore
+  - build-image
+
+- name: elixir-1-10
+  image: public.ecr.aws/prima/elixir:1.10.4-1
+  commands:
+  - mix local.hex --force
+  - mix local.rebar --force
+  - mix deps.get
+  - mix compile --all-warnings --warnings-as-errors
+  - mix test
+  - mix check
+  environment:
+    MIX_ENV: test
+  depends_on:
+  - elixir-1-9
+
+- name: elixir-1-11
+  image: public.ecr.aws/prima/elixir:1.11.2-1
+  commands:
+  - mix local.hex --force
+  - mix local.rebar --force
+  - mix deps.get
+  - mix compile --all-warnings --warnings-as-errors
+  - mix test
+  - mix check
+  environment:
+    MIX_ENV: test
+  depends_on:
+  - elixir-1-9
+  - elixir-1-10
 
 - name: cache-save
   image: 595659439703.dkr.ecr.eu-west-1.amazonaws.com/drone-tools:1.17.16
@@ -109,8 +127,9 @@ steps:
     branch:
     - master
   depends_on:
-  - elixir-1-8
   - elixir-1-9
+  - elixir-1-10
+  - elixir-1-11
 
 volumes:
 - name: docker
