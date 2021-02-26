@@ -11,26 +11,17 @@ clone:
 
 steps:
 - name: git-clone
-  image: 595659439703.dkr.ecr.eu-west-1.amazonaws.com/drone-git:1.3-3
+  image: public.ecr.aws/prima/drone-git:1.3-3
   environment:
     PLUGIN_DEPTH: 5
 
-- name: pre-start
-  image: 595659439703.dkr.ecr.eu-west-1.amazonaws.com/drone-tools:1.17.16
-  commands:
-  - pre-start-scripts
-  environment:
-    COUNTRY: it
-  depends_on:
-  - git-clone
-
 - name: cache-restore
-  image: 595659439703.dkr.ecr.eu-west-1.amazonaws.com/drone-tools:1.17.16
+  image: public.ecr.aws/prima/drone-tools:1.20.1
   commands:
   - . /etc/profile.d/ecs-credentials-endpoint
   - cache-restore
   environment:
-    COUNTRY: it
+    BUCKET_NAME: prima-ci-cache
   volumes:
   - name: ecs
     path: /etc/profile.d/ecs-credentials-endpoint
@@ -42,7 +33,7 @@ steps:
   - git-clone
 
 - name: check-secrets
-  image: 595659439703.dkr.ecr.eu-west-1.amazonaws.com/drone-tools:1.17.16
+  image: public.ecr.aws/prima/drone-tools:1.20.1
   commands:
   - . /etc/profile.d/ecs-credentials-endpoint
   - check-secrets-grants
@@ -52,11 +43,18 @@ steps:
   depends_on:
   - git-clone
 
+- name: check-public-docker-images
+  image: public.ecr.aws/prima/drone-tools:1.20.1
+  commands:
+  - check-public-docker-images
+  depends_on:
+  - git-clone
+
 - name: build-image
-  image: 595659439703.dkr.ecr.eu-west-1.amazonaws.com/drone-tools:1.17.16
+  image: public.ecr.aws/prima/drone-tools:1.20.1
   commands:
   - sed -i 's/USER app/USER root/g' ./Dockerfile
-  - docker build -t prima/posexional-ci:1 ./
+  - docker build -t prima/posexional-ci:${DRONE_COMMIT} ./
   volumes:
   - name: docker
     path: /var/run/docker.sock
@@ -65,26 +63,23 @@ steps:
   depends_on:
   - cache-restore
 
-- name: elixir-1-9
-  image: public.ecr.aws/prima/elixir-official:1.9.2
+- name: elixir-1-8
+  image: public.ecr.aws/prima/elixir-official:1.8.2
   commands:
   - mix local.hex --force
-  - mix local.rebar --force
   - mix deps.get
   - mix compile --all-warnings --warnings-as-errors
   - mix test
-  - mix check
+  - mix dialyzer --format=dialyzer
   environment:
     MIX_ENV: test
   depends_on:
   - cache-restore
-  - build-image
 
-- name: elixir-1-10
-  image: public.ecr.aws/prima/elixir:1.10.4-1
+- name: elixir-1-9
+  image: public.ecr.aws/prima/elixir-official:1.9.2
   commands:
   - mix local.hex --force
-  - mix local.rebar --force
   - mix deps.get
   - mix compile --all-warnings --warnings-as-errors
   - mix test
@@ -92,30 +87,15 @@ steps:
   environment:
     MIX_ENV: test
   depends_on:
-  - elixir-1-9
-
-- name: elixir-1-11
-  image: public.ecr.aws/prima/elixir:1.11.2-1
-  commands:
-  - mix local.hex --force
-  - mix local.rebar --force
-  - mix deps.get
-  - mix compile --all-warnings --warnings-as-errors
-  - mix test
-  - mix check
-  environment:
-    MIX_ENV: test
-  depends_on:
-  - elixir-1-9
-  - elixir-1-10
+  - elixir-1-8
 
 - name: cache-save
-  image: 595659439703.dkr.ecr.eu-west-1.amazonaws.com/drone-tools:1.17.16
+  image: public.ecr.aws/prima/drone-tools:1.20.1
   commands:
   - . /etc/profile.d/ecs-credentials-endpoint
-  - cache-save .gitignore
+  - cache-save _build deps
   environment:
-    COUNTRY: it
+    BUCKET_NAME: prima-ci-cache
   volumes:
   - name: ecs
     path: /etc/profile.d/ecs-credentials-endpoint
@@ -127,9 +107,8 @@ steps:
     branch:
     - master
   depends_on:
+  - elixir-1-8
   - elixir-1-9
-  - elixir-1-10
-  - elixir-1-11
 
 volumes:
 - name: docker
@@ -159,7 +138,7 @@ clone:
 
 steps:
 - name: email-failure
-  image: 595659439703.dkr.ecr.eu-west-1.amazonaws.com/drone-email
+  image: public.ecr.aws/prima/drone-email
   settings:
     from: noreply@prima.it
     host: email-smtp.eu-west-1.amazonaws.com
@@ -170,16 +149,18 @@ steps:
       from_secret: email_username
 
 trigger:
-  event:
-  - push
   status:
   - failure
+  target:
+    exclude:
+    - qa
+    - qa-stack
 
 depends_on:
 - default
 
 ---
 kind: signature
-hmac: 4ea937d760aecd54321925dd92bd817179b6d6adf48979a919779c87ae886a80
+hmac: 96c75b9379e0bc54606a1eb834394d7b1cdfa5ee56d415c6f1c118096a02a241
 
 ...
