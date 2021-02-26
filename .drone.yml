@@ -67,6 +67,7 @@ steps:
   image: public.ecr.aws/prima/elixir-official:1.9.2
   commands:
   - mix local.hex --force
+  - mix local.rebar --force
   - mix deps.get
   - mix compile --all-warnings --warnings-as-errors
   - mix test
@@ -178,6 +179,6 @@ depends_on:
 
 ---
 kind: signature
-hmac: 0b5be4edc704b283edfbe98ad67047711b2ccbb92d5754dc5159a9f1efc98a6e
+hmac: 1baab5839c0c187fb64e33d0eab730b6b0d2226a110674b9fe64c6643f4c7fde
 
 ...
