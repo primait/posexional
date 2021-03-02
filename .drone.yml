@@ -11,26 +11,17 @@ clone:
 
 steps:
 - name: git-clone
-  image: 595659439703.dkr.ecr.eu-west-1.amazonaws.com/drone-git:1.3-3
+  image: public.ecr.aws/prima/drone-git:1.3-3
   environment:
     PLUGIN_DEPTH: 5
 
-- name: pre-start
-  image: 595659439703.dkr.ecr.eu-west-1.amazonaws.com/drone-tools:1.17.16
-  commands:
-  - pre-start-scripts
-  environment:
-    COUNTRY: it
-  depends_on:
-  - git-clone
-
 - name: cache-restore
-  image: 595659439703.dkr.ecr.eu-west-1.amazonaws.com/drone-tools:1.17.16
+  image: public.ecr.aws/prima/drone-tools:1.20.1
   commands:
   - . /etc/profile.d/ecs-credentials-endpoint
   - cache-restore
   environment:
-    COUNTRY: it
+    BUCKET_NAME: prima-ci-cache
   volumes:
   - name: ecs
     path: /etc/profile.d/ecs-credentials-endpoint
@@ -42,7 +33,7 @@ steps:
   - git-clone
 
 - name: check-secrets
-  image: 595659439703.dkr.ecr.eu-west-1.amazonaws.com/drone-tools:1.17.16
+  image: public.ecr.aws/prima/drone-tools:1.20.1
   commands:
   - . /etc/profile.d/ecs-credentials-endpoint
   - check-secrets-grants
@@ -52,11 +43,18 @@ steps:
   depends_on:
   - git-clone
 
+- name: check-public-docker-images
+  image: public.ecr.aws/prima/drone-tools:1.20.1
+  commands:
+  - check-public-docker-images
+  depends_on:
+  - git-clone
+
 - name: build-image
-  image: 595659439703.dkr.ecr.eu-west-1.amazonaws.com/drone-tools:1.17.16
+  image: public.ecr.aws/prima/drone-tools:1.20.1
   commands:
   - sed -i 's/USER app/USER root/g' ./Dockerfile
-  - docker build -t prima/posexional-ci:1 ./
+  - docker build -t prima/posexional-ci:${DRONE_COMMIT} ./
   volumes:
   - name: docker
     path: /var/run/docker.sock
@@ -78,7 +76,6 @@ steps:
     MIX_ENV: test
   depends_on:
   - cache-restore
-  - build-image
 
 - name: elixir-1-10
   image: public.ecr.aws/prima/elixir:1.10.4-1
@@ -110,12 +107,12 @@ steps:
   - elixir-1-10
 
 - name: cache-save
-  image: 595659439703.dkr.ecr.eu-west-1.amazonaws.com/drone-tools:1.17.16
+  image: public.ecr.aws/prima/drone-tools:1.20.1
   commands:
   - . /etc/profile.d/ecs-credentials-endpoint
-  - cache-save .gitignore
+  - cache-save _build deps
   environment:
-    COUNTRY: it
+    BUCKET_NAME: prima-ci-cache
   volumes:
   - name: ecs
     path: /etc/profile.d/ecs-credentials-endpoint
@@ -159,7 +156,7 @@ clone:
 
 steps:
 - name: email-failure
-  image: 595659439703.dkr.ecr.eu-west-1.amazonaws.com/drone-email
+  image: public.ecr.aws/prima/drone-email
   settings:
     from: noreply@prima.it
     host: email-smtp.eu-west-1.amazonaws.com
@@ -170,16 +167,18 @@ steps:
       from_secret: email_username
 
 trigger:
-  event:
-  - push
   status:
   - failure
+  target:
+    exclude:
+    - qa
+    - qa-stack
 
 depends_on:
 - default
 
 ---
 kind: signature
-hmac: 4ea937d760aecd54321925dd92bd817179b6d6adf48979a919779c87ae886a80
+hmac: 1baab5839c0c187fb64e33d0eab730b6b0d2226a110674b9fe64c6643f4c7fde
 
 ...
