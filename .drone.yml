@@ -171,14 +171,15 @@ trigger:
   - failure
   target:
     exclude:
-    - qa
     - qa-stack
+    - qa-it
+    - qa
 
 depends_on:
 - default
 
 ---
 kind: signature
-hmac: 1baab5839c0c187fb64e33d0eab730b6b0d2226a110674b9fe64c6643f4c7fde
+hmac: b393bcb982613ddd2dce2a34a9761af5f5e6bd9dc505b0bae812c03bc29bc65d
 
 ...
