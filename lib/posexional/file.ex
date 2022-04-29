@@ -7,13 +7,6 @@ defmodule Posexional.File do
   defstruct rows: [],
             separator: "\n"
 
-  @type row :: any
-
-  @type t :: %{
-          rows: [row],
-          separator: String.t()
-        }
-
   def new(rows, separator \\ nil)
 
   def new(rows, nil) do
