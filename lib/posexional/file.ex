@@ -81,7 +81,7 @@ defmodule Posexional.File do
     str
     |> Stream.concat([separator])
     |> Stream.transform("", &stream_split(&1, &2, separator))
-    |> Stream.reject(&match?("", &1))
+    |> Stream.reject(&(&1 === ""))
     |> Stream.flat_map(&to_rows(&1, rows))
   end
 
