@@ -131,7 +131,7 @@ defmodule Posexional.Row do
          String.slice(content, (FieldSize.size(field) + String.length(separator))..-1)}
       end)
       |> elem(0)
-      |> Enum.filter(fn {k, _} -> not (k in [:empty_field]) end)
+      |> Enum.filter(fn {k, _} -> k not in [:empty_field] end)
 
     if is_nil(struct_module),
       do: [{name, res}],

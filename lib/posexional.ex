@@ -3,12 +3,7 @@ defmodule Posexional do
   @moduledoc """
   Posexional is a library to manage positional files in Elixir.
 
-  #{
-    readme
-    |> File.read!()
-    |> String.split("<!--MDOC !-->")
-    |> Enum.fetch!(1)
-  }
+  #{readme |> File.read!() |> String.split("<!--MDOC !-->") |> Enum.fetch!(1)}
   """
 
   @doc """
