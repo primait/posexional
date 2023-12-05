@@ -44,6 +44,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-mix-${{ env.cache-name }}-
             ${{ runner.os }}-mix-
+
+      - name: Remove cache
+        run: |
+          rm -rf _build
+          rm -rf deps
       # Conditionally bust the cache when job is re-run.
       # Sometimes, we may have issues with incremental builds that are fixed by doing a full recompile.
       # In order to not waste dev time on such trivial issues force a full recompile only on builds that are retried.
