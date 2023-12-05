@@ -1,4 +1,4 @@
-FROM elixir:1.10.3
+FROM public.ecr.aws/prima/elixir:1.15.7
 
 WORKDIR /code
 
