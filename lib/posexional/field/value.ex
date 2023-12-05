@@ -4,13 +4,15 @@ defmodule Posexional.Field.Value do
   """
   alias Posexional.Field
 
+  @type t :: %__MODULE__{}
+
   defstruct name: nil,
             size: nil,
             filler: ?\s,
             alignment: :left,
             default: nil
 
-  @spec new(atom, integer, Keyword.t()) :: %Posexional.Field.Value{}
+  @spec new(atom, integer, Keyword.t()) :: Field.Value.t()
   def new(name, size, opts \\ []) do
     opts = Keyword.merge([name: name, size: size, filler: ?\s, alignment: :left, default: nil], opts)
 
@@ -49,7 +51,7 @@ defmodule Posexional.Field.Value do
       iex> Posexional.Field.Value.write(Posexional.Field.Value.new(:test, 10), 50)
       ** (RuntimeError) The value provided for the test field doesn't seem to be a string
   """
-  @spec write(%Field.Value{}, binary) :: binary
+  @spec write(Field.Value.t(), binary) :: binary
   def write(%Field.Value{filler: filler, size: size, default: nil}, nil) do
     String.duplicate(to_string([filler]), size)
   end

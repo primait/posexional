@@ -27,7 +27,7 @@ defmodule Posexional.Field.TypedField do
 
   @type t :: %__MODULE__{}
 
-  @spec new(atom(), field_type(), integer(), Keyword.t()) :: %Posexional.Field.TypedField{}
+  @spec new(atom(), field_type(), integer(), Keyword.t()) :: Field.TypedField.t()
   def new(name, type, size, opts \\ []) do
     value = Value.new(name, size, opts)
 

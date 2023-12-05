@@ -6,28 +6,30 @@ defmodule Posexional.Row do
   alias Posexional.{Field, Row}
   alias Posexional.Protocol.{FieldLength, FieldName, FieldRead, FieldSize, FieldWrite}
 
+  @type t :: %__MODULE__{}
+
   defstruct name: nil,
             fields: [],
             separator: "",
             row_guesser: :never,
             struct_module: nil
 
-  @spec new(atom, [struct], Keyword.t()) :: %Row{}
+  @spec new(atom, [struct], Keyword.t()) :: Row.t()
   def new(name, fields, opts \\ []) do
     struct!(Row, Keyword.merge([name: name, fields: fields], opts))
   end
 
-  @spec add_field(%Row{}, struct) :: %Row{}
+  @spec add_field(Row.t(), struct) :: Row.t()
   def add_field(row = %Row{fields: fields}, field) do
     %{row | fields: fields ++ [field]}
   end
 
-  @spec add_fields(%Row{}, []) :: %Row{}
+  @spec add_fields(Row.t(), []) :: Row.t()
   def add_fields(row, fields) do
     Enum.reduce(fields, row, fn field, row -> add_field(row, field) end)
   end
 
-  @spec manage_counters(%Row{}, [{atom, pid}]) :: %Row{}
+  @spec manage_counters(Row.t(), [{atom, pid}]) :: Row.t()
   def manage_counters(row = %Posexional.Row{fields: fields}, counters) do
     new_fields =
       Stream.map(fields, fn
@@ -66,17 +68,14 @@ defmodule Posexional.Row do
       ...>   |> Posexional.Row.write([])
       {:ok, "     "}
   """
-  @spec write(%Row{}, Keyword.t()) :: {atom, binary}
+  @spec write(Row.t(), Keyword.t()) :: {atom, binary}
   def write(%Row{fields: []}, _), do: {:ok, ""}
 
   def write(row = %Row{separator: separator}, values) do
     result = do_output(row, values)
 
     if Enum.all?(result, &valid?/1) do
-      {:ok,
-       result
-       |> Enum.map(&elem(&1, 1))
-       |> Enum.join(separator)}
+      {:ok, Enum.map_join(result, separator, &elem(&1, 1))}
     else
       {:error, error_message(result)}
     end
@@ -109,18 +108,13 @@ defmodule Posexional.Row do
   end
 
   defp do_error_message(errors) do
-    field_names =
-      errors
-      |> Enum.map(&elem(&1, 1))
-      |> Enum.join(", ")
-
-    "errors on fields #{field_names}"
+    "errors on fields #{Enum.map_join(errors, ", ", &elem(&1, 1))}"
   end
 
   @doc """
   read a positional file row and convert it back to a keyword list of values
   """
-  @spec read(%Row{}, binary) :: Keyword.t()
+  @spec read(Row.t(), binary) :: Keyword.t()
   def read(%Row{name: name, fields: fields, separator: separator, struct_module: struct_module}, content) do
     res =
       fields
@@ -153,7 +147,7 @@ defmodule Posexional.Row do
       ...>   |> Posexional.Row.find_field(:test2)
       Posexional.Field.Value.new(:test2, 5)
   """
-  @spec find_field(%Row{}, atom) :: %Field.Value{}
+  @spec find_field(Row.t(), atom) :: Field.Value.t()
   def find_field(%Row{fields: fields}, name) do
     Enum.find(fields, nil, fn %Field.Value{name: field_name} -> field_name == name end)
   end
@@ -171,7 +165,7 @@ defmodule Posexional.Row do
       ...>   |> Posexional.Row.length
       30
   """
-  @spec length(%Row{}) :: integer
+  @spec length(Row.t()) :: integer
   def length(%Row{fields: []}), do: 0
   def length(%Row{fields: fields}), do: do_length(0, fields)
 
@@ -202,7 +196,7 @@ defmodule Posexional.Row do
       ...>     |> Posexional.Row.offset(:test)
       nil
   """
-  @spec offset(%Row{}, atom) :: integer
+  @spec offset(Row.t(), atom) :: integer
   def offset(%Row{fields: []}, _), do: nil
   def offset(%Row{fields: fields}, field_name), do: do_offset(1, fields, field_name)
 
@@ -220,7 +214,7 @@ defmodule Posexional.Row do
   @doc """
   merge fields from another row
   """
-  @spec fields_from(%Row{}, %Row{}) :: %Row{}
+  @spec fields_from(Row.t(), Row.t()) :: Row.t()
   def fields_from(to, %Row{fields: other_fields}) do
     %{to | fields: to.fields ++ other_fields}
   end

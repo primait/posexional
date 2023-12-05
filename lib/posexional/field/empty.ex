@@ -4,11 +4,13 @@ defmodule Posexional.Field.Empty do
   """
   alias Posexional.Field
 
+  @type t :: %__MODULE__{}
+
   defstruct size: nil,
             filler: ?\s
 
-  @spec new(integer) :: %Posexional.Field.Empty{}
-  @spec new(integer, Keyword.t()) :: %Posexional.Field.Empty{}
+  @spec new(integer) :: Field.Empty.t()
+  @spec new(integer, Keyword.t()) :: Field.Empty.t()
   def new(size, opts \\ []) do
     opts = Keyword.merge([size: size, filler: ?\s], opts)
     %Posexional.Field.Empty{size: opts[:size], filler: opts[:filler]}
@@ -25,7 +27,7 @@ defmodule Posexional.Field.Empty do
       iex> Posexional.Field.Empty.write(%Posexional.Field.Empty{filler: ?\\s, size: 2})
       "  "
   """
-  @spec write(%Field.Empty{}) :: binary
+  @spec write(Field.Empty.t()) :: binary
   def write(%Field.Empty{filler: filler, size: size}) do
     String.duplicate(to_string([filler]), size)
   end
