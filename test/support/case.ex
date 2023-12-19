@@ -5,7 +5,7 @@ defmodule Posexional.Case do
 
   using do
     quote do
-      alias Posexional.{Field, File, Row}
+      # alias Posexional.{Field, File, Row}
     end
   end
 end

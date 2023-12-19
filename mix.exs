@@ -18,9 +18,7 @@ defmodule Posexional.Mixfile do
       package: package(),
       description: "A library to manage positional files",
       dialyzer: [
-        plt_add_apps: [:mix],
-        plt_add_deps: :transitive,
-        ignore_warnings: ".dialyzerignore"
+        plt_add_apps: [:mix, :ex_unit]
       ]
     ]
   end
