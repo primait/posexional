@@ -1,3 +1,4 @@
 :0: Unknown function 'Elixir.ExUnit.CaseTemplate':'__proxy__'/2
 test/support/generator.ex:6: Function setup_file/0 has no local return
 test/support/generator.ex:10: The call 'Elixir.Posexional.Row':new('test',[#{'__struct__':='Elixir.Posexional.Field.Empty' | 'Elixir.Posexional.Field.ProgressiveNumber' | 'Elixir.Posexional.Field.Value', 'filler':=_, 'size':=_, 'alignment'=>_, 'counter'=>'nil', 'default'=>_, 'name'=>_},...],'always') will never return since the success typing is (any(),any(),[{atom(),_}]) -> #{'__struct__':=atom(), atom()=>_} and the contract is (atom(),[],'Elixir.Keyword':t()) -> #{'__struct__':='Elixir.Posexional.Row','fields':=term(),'name':=term(),'row_guesser':=term(),'separator':=term()}
+test/support/case.ex:6: Unknown function 'Elixir.ExUnit.CaseTemplate':'__proxy__'/2

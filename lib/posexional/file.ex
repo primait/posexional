@@ -4,6 +4,8 @@ defmodule Posexional.File do
   """
   alias Posexional.{Field, Row}
 
+  @type t :: %__MODULE__{}
+
   defstruct rows: [],
             separator: "\n"
 
@@ -34,7 +36,7 @@ defmodule Posexional.File do
       ...> )
       ** (RuntimeError) row ne not found
   """
-  @spec write(%Posexional.File{}, Keyword.t()) :: binary
+  @spec write(Posexional.File.t(), Keyword.t()) :: binary
   def write(file = %Posexional.File{separator: separator}, values) do
     file
     |> manage_counters
@@ -42,7 +44,7 @@ defmodule Posexional.File do
     |> Enum.join(separator)
   end
 
-  @spec write_path!(%Posexional.File{}, Keyword.t(), binary) :: {:ok, binary} | {:error, any}
+  @spec write_path!(Posexional.File.t(), Keyword.t(), binary) :: {:ok, binary} | {:error, any}
   def write_path!(file = %Posexional.File{separator: separator}, values, path) do
     with {:ok, _} <-
            File.open(path, [:write], fn handle ->
@@ -57,7 +59,7 @@ defmodule Posexional.File do
     end
   end
 
-  @spec read(%Posexional.File{}, binary) :: [tuple() | String.t()]
+  @spec read(Posexional.File.t(), binary) :: [tuple() | String.t()]
   def read(%Posexional.File{separator: separator, rows: rows}, content) do
     content
     |> String.split(separator)
@@ -76,7 +78,7 @@ defmodule Posexional.File do
     end)
   end
 
-  @spec stream(Enumerable.t(), %Posexional.File{}) :: Enumerable.t()
+  @spec stream(Enumerable.t(), Posexional.File.t()) :: Enumerable.t()
   def stream(str, _file = %{separator: separator, rows: rows}) do
     str
     |> Stream.concat([separator])
@@ -104,7 +106,7 @@ defmodule Posexional.File do
   defp binary_to_rows(content, row),
     do: Row.read(row, content)
 
-  @spec get_lines(%Posexional.File{}, Keyword.t()) :: Enumerable.t()
+  @spec get_lines(Posexional.File.t(), Keyword.t()) :: Enumerable.t()
   defp get_lines(file, values) do
     values
     |> Stream.map(fn {row_name, values} -> {find_row(file, row_name), row_name, values} end)
@@ -123,13 +125,13 @@ defmodule Posexional.File do
 
   The fields are grouped by name, so that you can specify many counters for every row
   """
-  @spec manage_counters(%Posexional.File{}) :: %Posexional.File{}
+  @spec manage_counters(Posexional.File.t()) :: Posexional.File.t()
   def manage_counters(file = %Posexional.File{rows: rows}) do
     counters = get_counters(file)
     %{file | rows: Stream.map(rows, &Row.manage_counters(&1, counters))}
   end
 
-  @spec get_counters(%Posexional.File{}) :: [{atom, pid}]
+  @spec get_counters(Posexional.File.t()) :: [{atom, pid}]
   def get_counters(%Posexional.File{rows: rows}) do
     rows
     |> Stream.flat_map(& &1.fields)
@@ -144,7 +146,7 @@ defmodule Posexional.File do
     end)
   end
 
-  @spec guess_row(binary, [%Row{}]) :: %Row{} | nil
+  @spec guess_row(binary, [Row.t()]) :: Row.t() | nil
   defp guess_row(content, rows) do
     Enum.find(rows, nil, fn
       %Row{row_guesser: :always} -> true
@@ -153,7 +155,7 @@ defmodule Posexional.File do
     end)
   end
 
-  @spec find_row(%Posexional.File{}, atom) :: %Row{}
+  @spec find_row(Posexional.File.t(), atom) :: Row.t()
   def find_row(%Posexional.File{rows: rows}, name) do
     Enum.find(rows, nil, fn %Row{name: row_name} -> row_name == name end)
   end

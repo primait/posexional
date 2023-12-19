@@ -4,21 +4,23 @@ defmodule Posexional.Field.ProgressiveNumber do
   """
   alias Posexional.Field
 
+  @type t :: %__MODULE__{}
+
   defstruct name: nil,
             size: nil,
             filler: ?\s,
             alignment: :right,
             counter: nil
 
-  @spec new(atom, integer) :: %Posexional.Field.ProgressiveNumber{}
-  @spec new(atom, integer, Keyword.t()) :: %Posexional.Field.ProgressiveNumber{}
+  @spec new(atom, integer) :: Field.ProgressiveNumber.t()
+  @spec new(atom, integer, Keyword.t()) :: Field.ProgressiveNumber.t()
   def new(name, size, opts \\ []) do
     opts = Keyword.merge([name: name, size: size, filler: ?\s, alignment: :right], opts)
 
     %Field.ProgressiveNumber{name: opts[:name], size: opts[:size], filler: opts[:filler], alignment: opts[:alignment]}
   end
 
-  @spec write(%Field.ProgressiveNumber{}, integer) :: binary
+  @spec write(Field.ProgressiveNumber.t(), integer) :: binary
   def write(field, value) do
     value
     |> to_string
