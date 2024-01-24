@@ -1,4 +1,4 @@
-FROM elixir:1.14.5-otp-25
+FROM elixir:1.16-otp-25
 
 WORKDIR /code
 
