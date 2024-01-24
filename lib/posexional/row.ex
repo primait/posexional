@@ -122,7 +122,7 @@ defmodule Posexional.Row do
         field_content = String.slice(content, 0, FieldSize.size(field))
 
         {list ++ [{FieldName.name(field), FieldRead.read(field, field_content)}],
-         String.slice(content, (FieldSize.size(field) + String.length(separator))..-1)}
+         String.slice(content, (FieldSize.size(field) + String.length(separator))..-1//1)}
       end)
       |> elem(0)
       |> Enum.filter(fn {k, _} -> k not in [:empty_field] end)
