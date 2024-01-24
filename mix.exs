@@ -29,7 +29,9 @@ defmodule Posexional.Mixfile do
   defp elixirc_paths(_), do: ["lib"]
 
   def application do
-    [applications: [:logger], extra_applications: [:timex]]
+    [
+      extra_applications: [:logger, :timex]
+    ]
   end
 
   defp package do
