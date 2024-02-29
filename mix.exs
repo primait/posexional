@@ -19,7 +19,7 @@ defmodule Posexional.Mixfile do
       description: "A library to manage positional files",
       dialyzer: [
         plt_add_apps: [:mix],
-        plt_add_deps: :transitive,
+        plt_add_deps: :app_tree,
         ignore_warnings: ".dialyzerignore"
       ]
     ]
@@ -46,7 +46,7 @@ defmodule Posexional.Mixfile do
     [
       {:timex, "~> 3.0"},
       {:credo, "~> 1.0", only: [:dev, :test], runtime: false},
-      {:dialyxir, "== 1.4.1", only: [:dev, :test], runtime: false},
+      {:dialyxir, "== 1.4.3", only: [:dev, :test], runtime: false},
       {:ex_doc, "~> 0.21", only: :dev}
     ]
   end
