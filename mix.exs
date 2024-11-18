@@ -46,7 +46,7 @@ defmodule Posexional.Mixfile do
     [
       {:timex, "~> 3.0"},
       {:credo, "~> 1.0", only: [:dev, :test], runtime: false},
-      {:dialyxir, "== 1.4.3", only: [:dev, :test], runtime: false},
+      {:dialyxir, "== 1.4.5", only: [:dev, :test], runtime: false},
       {:ex_doc, "~> 0.21", only: :dev}
     ]
   end
