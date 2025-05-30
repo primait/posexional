@@ -12,6 +12,8 @@ defmodule Posexional.FileTest do
       value :test_value, 5, filler: ?-
       progressive_number :test1, 3, filler: ?0
       progressive_number :test2, 3, filler: ?0
+
+      enforce_length 15
     end
   end
 

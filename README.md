@@ -151,6 +151,32 @@ This is the output.
 
 Positional files cool again!!! Well no...they still sucks...but a little less.
 
+## Compile time validation
+
+```elixir
+defmodule BeatlesFile do
+  use PosexionalFile
+
+  @separator "\\n"
+
+  row :beatles do # add :always here to always match this row while reading
+    value :name, 5, filler: ?-
+    empty 5
+
+    enforce_length 9 # the actual row length is 10
+  end
+end
+```
+
+In case you'd know the length of the row in advance you can enforce the compiler
+to validate the length. The example above will result in an exception at compile
+time like this: 
+
+```shell
+== Compilation error in file test/posexional/beatles.exs ==
+** (RuntimeError) The length of the row (10) doens't match the expetation (9)
+```
+
 <!--MDOC !-->
 
 ## Contributing
