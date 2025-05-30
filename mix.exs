@@ -2,7 +2,7 @@ defmodule Posexional.Mixfile do
   use Mix.Project
 
   @source_url "https://github.com/primait/posexional"
-  @version "1.1.1"
+  @version "1.2.1"
 
   def project do
     [
