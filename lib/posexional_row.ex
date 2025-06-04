@@ -4,6 +4,7 @@ defmodule PosexionalRow do
   """
 
   alias Posexional.Field
+  alias Posexional.Protocol.FieldLength
 
   @doc """
   add use Posexional on top of an elixir module to use macros to define fields
@@ -121,6 +122,22 @@ defmodule PosexionalRow do
   defmacro field(field_name, type, size, opts \\ []) do
     quote do
       @fields Field.TypedField.new(unquote(field_name), unquote(type), unquote(size), unquote(opts))
+    end
+  end
+
+  @doc """
+  enforce the row fields length sum to be equal to count. Raise an exception at
+  compile time otherwise. It's useful when you know the row length in advance.
+  """
+  defmacro enforce_length(count) do
+    quote do
+      s =
+        @fields
+        |> Enum.map(fn x -> FieldLength.length(x) end)
+        |> Enum.sum()
+
+      if s != unquote(count),
+        do: raise("The length of the row (#{s}) doesn't match the expectation (#{unquote(count)})")
     end
   end
 end

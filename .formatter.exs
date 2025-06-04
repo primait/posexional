@@ -12,6 +12,7 @@
     separator: 1,
     value: :*,
     field: :*,
+    enforce_length: :*,
 
     # Formatter tests
     assert_format: 2,

@@ -18,6 +18,8 @@ defmodule Posexional.RowTest do
 
     def matcher(<<"test", _::binary>>), do: true
     def matcher(_), do: false
+
+    enforce_length(4 + 8 + 5 + 5)
   end
 
   defmodule FileModule do
