@@ -136,7 +136,7 @@ defmodule PosexionalRow do
         |> Enum.map(fn x -> FieldLength.length(x) end)
         |> Enum.sum()
 
-      if s != unquote(count), do: raise("The length of the row (#{s}) doens't match the expetation (#{unquote(count)})")
+      if s != unquote(count), do: raise("The length of the row (#{s}) doesn't match the expectation (#{unquote(count)})")
     end
   end
 end
