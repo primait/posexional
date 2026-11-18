@@ -42,7 +42,7 @@ defmodule Posexional do
   @spec stream!(Posexional.File.t(), binary) :: any()
   def stream!(file, path) do
     path
-    |> File.stream!([], 2048)
+    |> File.stream!(2048)
     |> Posexional.File.stream(file)
   end
 end
