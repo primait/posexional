@@ -44,7 +44,7 @@ defmodule Posexional.Mixfile do
 
   defp deps do
     [
-      {:timex, "~> 3.0"},
+      {:timex, "~> 4.0"},
       {:credo, "~> 1.0", only: [:dev, :test], runtime: false},
       {:dialyxir, "== 1.4.7", only: [:dev, :test], runtime: false},
       {:ex_doc, "~> 0.21", only: :dev}
